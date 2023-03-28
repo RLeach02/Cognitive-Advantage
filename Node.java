@@ -6,15 +6,15 @@ import java.util.*;
 import com.jcraft.jsch.*;
 import java.io.*;
 
-public class Node {
-//Attributes
+public class IT_proj1_connection {
+    //Attributes
     private int networkSize = 2;
     private ArrayList<Network> networkList = new ArrayList<>();
     private JSch jsch;
     private Session session;
     private Channel channel;
     
-    public Node(String host, String username, String password) {
+    public IT_proj1_connection(String host, String username, String password) {
         try {
             jsch = new JSch();
             session = jsch.getSession(username, host, 22);
@@ -45,13 +45,13 @@ public class Node {
 
             InputStream in = channel.getInputStream();
             channel.connect();
-           
+            
             byte[] buffer = new byte[1024];
             for (int i = 0;i <= networkSize-1; i++) {
                 if (in.read(buffer) != -1) {
                     line[i] = new String(buffer);
                 }
-            }  
+            }   
             for (int i = 0;i <= networkSize-1; i++) {     
                 String[] data = line[i].split(" ");
                 for (int j = 0;j <= data.length; j++) {
@@ -74,53 +74,7 @@ public class Node {
             e.printStackTrace();
         }
     }     
-    
-    public void pingNetwork(Network net, int pingTime) {
-        String packetLoss = new String();
-        String[] latency = new String[4];
-        String ping = new String();
-        
-        String pingCmd = "ping -c " + pingTime + " " +  net.getIpAddress();
-        try {
-            // Create a channel
-            Channel channel = session.openChannel("exec");
-            ((ChannelExec)channel).setCommand(pingCmd);
-            channel.setInputStream(null);
-            ((ChannelExec)channel).setErrStream(System.err);
 
-            InputStream in = channel.getInputStream();
-            channel.connect();
-            
-            byte[] buffer = new byte[1024];
-            
-            while (in.read(buffer) != -1) {
-                ping = new String(buffer);
-                System.out.println(ping);
-            }
-            System.out.println(ping);
-            
-            String[] data = ping.split(" ");
-            for (int i = 0;i <= data.length; i++) {
-                if (data[i].equals("packet")) {
-                    packetLoss = data[i-1];
-                }
-                else if (data[i].equals("min/avg/max/mdev")) {
-                    String allLatency = data[i+2];
-                    latency = allLatency.split("/");
-                    break;
-                }
-            }
-            System.out.println("Packet loss: " + packetLoss
-                             + "\nmin latency: " + latency[0]
-                             + "\naverage latency: " + latency[1]
-                             + "\nmax latency: " + latency[2]
-                             + "\nmdev latency: " + latency[3]);
-            channel.disconnect();
-        } catch (JSchException | IOException e) {
-            e.printStackTrace();
-        }
-    }
-    
     public void disconnectSSHConnection() {
         try {
             session.disconnect();
@@ -130,17 +84,18 @@ public class Node {
     }
     
     public void init() {
+        //String cmd = "Is -la";
         String cmd = "ip route";
+        //String cmd = "ping -c 5 100.119.74.240"; //ping cellular
         getName_Metric_IP(cmd);
-        pingNetwork(networkList.get(0), 5);
         disconnectSSHConnection();
         for (int i = 0;i <= networkSize-1; i++) {
             System.out.println(networkList.get(i));
         }
     }
     public static void main(String[] args) {
-        Node n1 = new Node("100.122.154.164", "your usename", "your password");
-        n1.init();
+        IT_proj1_connection test1 = new IT_proj1_connection("100.122.154.164", "pat", "yourpassword");
+        test1.init();
         
     }
 }
