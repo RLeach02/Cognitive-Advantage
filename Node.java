@@ -155,7 +155,7 @@ public class Node {
         disconnectSSHConnection();
     }
     public static void main(String[] args) {
-        Node n1 = new Node("100.122.154.164", "pat", "Your pass");
+        Node n1 = new Node("HOST IP ADDRESS", "USERNAME", "PASSWORD");
         n1.init();
         
     }
