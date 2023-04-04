@@ -4,7 +4,7 @@ import java.io.*;
 /**
  * A class that represent each Node that can connect to different types of network.
  * @author chitipat marsri
- * @version 30 Mar 2023
+ * @version 04 Apr 2023
  */
 public class Node {
     //Attributes
@@ -95,7 +95,7 @@ public class Node {
                     if (i < 0) break;
                     String line = new String(tmp, 0, i);
                     output.add(line);
-                    System.out.print(line);
+                    //System.out.print(line);
                 }
                 if (channel.isClosed()) {
                     //System.out.println("Exit status: " + channel.getExitStatus());
@@ -110,10 +110,10 @@ public class Node {
     }
     /**
      * This method will paste the command to giveCommand method and extract the relevant information such as name, IP address, metric
-     * @param command string of command
      */
-    public void getName_Metric_IP(String command) {
-                ArrayList<String> name = new ArrayList<>();
+    public void getName_Metric_IP() {
+        String command = "ip route";
+        ArrayList<String> name = new ArrayList<>();
         ArrayList<String> ip = new ArrayList<>();
         ArrayList<Integer> metric = new ArrayList<>();
         
@@ -151,7 +151,7 @@ public class Node {
             num++;
         }
         networkSize = count;
-        System.out.println("There are "+ networkSize+ " network");
+        //System.out.println("There are "+ networkSize+ " network");
     }
     /**
      * This method will paste the command to giveCommand method and change the metric of a network
@@ -159,8 +159,8 @@ public class Node {
      * @param newMetric new metric number
      * @param sudoPassword password for sudo command
      */
-    public void changeMetric(Network net, int newMetric, String sudoPassword) {
-        String cmd1 = "nmcli con edit " + net.getName();
+    public void changeMetric(String networkName, int newMetric) {
+        String cmd1 = "nmcli con edit " + networkName;
         String cmd2 = "set ipv4.route-metric " + newMetric;
         String cmd3 = "save";
         String cmd4 = "quit";
@@ -173,7 +173,7 @@ public class Node {
             InputStream in = channel.getInputStream();
             ((ChannelExec) channel).setPty(true);
             channel.connect();
-            out.write((sudoPassword + "\n").getBytes());
+            out.write((password + "\n").getBytes());
             out.flush();
             timer(1);
             out.write((cmd2 + "\n").getBytes());
@@ -190,10 +190,10 @@ public class Node {
                 while (in.available() > 0) {
                     int i = in.read(tmp, 0, 1024);
                     if (i < 0) break;
-                    System.out.print(new String(tmp, 0, i));
+                    //System.out.print(new String(tmp, 0, i));
                 }
                 if (channel.isClosed()) {
-                    System.out.println("Exit status: " + channel.getExitStatus());
+                    //System.out.println("Exit status: " + channel.getExitStatus());
                     break;
                 }
             }
@@ -205,37 +205,35 @@ public class Node {
     }
     /**
      * This method will turn the network off
-     * @param net a required network
+     * @param networkName a required network name
      */
-    public void turnOffNetwork(Network net) {
+    public void turnOffNetwork(String networkName) {
         ArrayList<String> in = new ArrayList<>();
-        if (net.getName().contains("wwan")) {
-            String command = "nmcli con down '" + net.getName() + "'";
+        if (networkName.contains("wwan")) {
+            String command = "nmcli con down '" + networkName + "'";
             in = giveSudoCommand(command, password);
         }
-        else if(net.getName().contains("enp")) {
-            String command = "ip link set " + net.getName() + " down";
+        else if(networkName.contains("enp")) {
+            String command = "ip link set " + networkName + " down";
             in = giveSudoCommand(command, password);
         }
-        System.out.println("Turn off " + net.getName() + " successfully");
+        System.out.println("Turn off " + networkName + " successfully");
     }
     /**
      * This method will turn the network on
-     * @param net a required network
+     * @param networkName a required network name
      */
-    public void turnOnNetwork(Network net) {
+    public void turnOnNetwork(String networkName) {
         ArrayList<String> in = new ArrayList<>();
-        if (net.getName().contains("wwan")) {
-            String command = "nmcli con up '" + net.getName() + "'";
+        if (networkName.contains("wwan")) {
+            String command = "nmcli con up '" + networkName + "'";
             in = giveSudoCommand(command, password);
         }
-        else if(net.getName().contains("enp")) {
-            String command = "ip link set " + net.getName() + " up";
+        else if(networkName.contains("enp")) {
+            String command = "ip link set " + networkName + " up";
             in = giveSudoCommand(command, password);
         }
-        String command = "ip link set enp10s0 up";
-        //in = giveSudoCommand(command, password);
-        System.out.println("Turn on " + net.getName() + " successfully");
+        System.out.println("Turn on " + networkName + " successfully");
     }
     /**
      * This method will be used to set a timer between each command
@@ -280,30 +278,54 @@ public class Node {
                              + "\nmdev latency: " + latency[3]);
     }
     /**
+     * Method to return a list of network
+     * @return a list of network
+     */
+    public ArrayList<Network> getNetworkList() {
+        return networkList;
+    }
+    /**
+     * Method to return size of network list
+     * @return int of size
+     */
+    public int getNetworkListSize() {
+        return networkList.size();
+    }
+    /**
+     * Method to print the network bearer in the network list
+     */
+    public void printNetworkList() {
+        for (Network net : networkList) {
+            System.out.println(net);
+        }
+    }
+    /**
      * This method will disconnect the Putty
      */
     public void disconnectSSHConnection() {
         try {
             session.disconnect();
+            System.out.println("Disconnect successfully");
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
     public void init() {
-        String cmd = "ip route";
-        getName_Metric_IP(cmd);
+        getName_Metric_IP();
         for (Network net : networkList) {
             System.out.println(net);
         }
-        //pingNetwork(networkList.get(0), 5);
-        turnOffNetwork(networkList.get(0));
-        timer(10);
-        turnOnNetwork(networkList.get(0));
+        //pingNetwork(networkList.get(1), 5);
+        changeMetric("wwan0", 250);
+        timer(2);
+        turnOffNetwork("wwan0");
+        timer(5);
+        turnOnNetwork("wwan0");
         disconnectSSHConnection();
-        //changeMetric(networkList.get(0), 250, password);
+        printNetworkList();
     }
     public static void main(String[] args) {
-        Node n1 = new Node("Host", "User", "Password");
+        Node n1 = new Node("Host", "user", "Pass");
         n1.init();
     }
 }
