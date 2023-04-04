@@ -338,16 +338,43 @@ public class Node {
             networkList.add(network);
         }
     }
-    public void monitor() {
-        for (Network network : networkList) {
-            pingNetwork(network, 5);
+    /**
+     * a method to automatically changing network.
+     */
+    public void monitor(int times) {
+        /* 
+        for (int n = 0; n < times; n++) {
+            for (Network network : networkList) {
+                pingNetwork(network, 5);
+            }
+            sortNetworks();
+            for (int i = 1; i < networkList.size(); i++) {
+                int newMetric =networkList.get(0).getMetric()+i;
+                changeMetric(networkList.get(i).getName(), newMetric);
+                turnOffNetwork(networkList.get(i).getName());
+                turnOnNetwork(networkList.get(i).getName());
+            }
+            timer(30);
         }
-        sortNetworks();
-        for (int i = 1; i < networkList.size(); i++) {
-            int newMetric =networkList.get(0).getMetric()+i;
-            changeMetric(networkList.get(i).getName(), newMetric);
-            turnOffNetwork(networkList.get(i).getName());
-            turnOnNetwork(networkList.get(i).getName());
+        */
+        // for currently Testbed
+        for (int n = 0; n < times; n++) {
+            for (Network network : networkList) {
+                pingNetwork(network, 5);
+            }
+            sortNetworks();
+            if (networkList.get(0).getName().equals("wwan0")) {
+                int newMetric =networkList.get(1).getMetric()-10;
+                changeMetric(networkList.get(0).getName(), newMetric);
+                turnOffNetwork(networkList.get(0).getName());
+                turnOnNetwork(networkList.get(0).getName());
+            } else {
+                int newMetric =networkList.get(0).getMetric()+10;
+                changeMetric(networkList.get(1).getName(), newMetric);
+                turnOffNetwork(networkList.get(1).getName());
+                turnOnNetwork(networkList.get(1).getName());
+            }
+            timer(30);
         }
     }
     /**
@@ -367,16 +394,14 @@ public class Node {
             System.out.println(net);
         }
         //pingNetwork(networkList.get(0), 5);
-        
         changeMetric("wwan0", 140);
         turnOffNetwork("wwan0");
         turnOnNetwork("wwan0");
-        
         disconnectSSHConnection();
         printNetworkList();
     }
     public static void main(String[] args) {
-        Node n1 = new Node("100.122.154.164", "pat", "Thunderpat123");
+        Node n1 = new Node("host", "user", "pass");
         n1.init();
     }
 }
