@@ -165,11 +165,10 @@ public class Network implements Comparable<Network> {
                 }
             } 
         }
-        System.out.println("\n\n");
         for (Network network : badNetworks) {
             sortedNetworks.add(network);
         }
-        System.out.println("\n\n");
+        System.out.println("\n");
         for (Network network : networks) {
             System.out.println(network.getName() + ": " + network.getLatency().get(1) + " ms" + "packet loss: " + network.getPacketLoss() + " %");
         }
