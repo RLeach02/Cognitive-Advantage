@@ -12,35 +12,56 @@ public class CognitiveAdvantageUserInterface {
     public void init() {
         System.out.println("Welcome to Cognitive Advantage");
         Node n0 = new Node("100.122.154.164", "pat", "Thunderpat123");
-        //ask if user want to change the number or not
+        n0.getName_Metric_IP();
         while (true) {
             System.out.println("\nWhat do you want to do? (1-6 only)"
                     + "\n1: Show the network bearer list"
-                    + "\n2: Turn off "
-                    + "\n3: Turn on "
-                    + "\n4: change metric "
-                    + "\n5: ping "
+                    + "\n2.1: Turn off wwan0"
+                    + "\n2.2: Turn off enp10s0"
+                    + "\n3.1: Turn on wwan0"
+                    + "\n3.2: Turn on enp10s0"
+                    + "\n4.1: change metric wwan0"
+                    + "\n4.2: change metric enp10s0 (currently not working)"
+                    + "\n5.1: ping wwan0 (currently not working)"
+                    + "\n5.2: ping enp10s0"
                     + "\n6: exit "
-                    + "\n7: sort network bearers"
-                    + "\n8: automatic change every 30 seconds");
-            String ans = scan.nextLine().toLowerCase();
+                    + "\n7: sort network bearers (currently not working)"
+                    + "\n8: automatic change every 30 seconds (currently not working)");
+            String ans = scan.nextLine();
             if (ans.equals("1")) {
-                n0.getName_Metric_IP();
                 System.out.println("There are " + n0.getNetworkListSize() + " network bearers");
                 n0.printNetworkList();
             }
-            else if (ans.equals("2")) {
+            else if (ans.equals("2.1")) {
                 n0.turnOffNetwork("wwan0");
             }
-            else if (ans.equals("3")) {
+            else if (ans.equals("2.2")) {
+                n0.turnOffNetwork("enp10s0");
+            }
+            else if (ans.equals("3.1")) {
                 n0.turnOnNetwork("wwan0");
             }
-            else if (ans.equals("4")) {
-                n0.changeMetric("wwan0", 230);
+            else if (ans.equals("3.2")) {
+                n0.turnOnNetwork("enp10s0");
+            }
+            else if (ans.equals("4.1")) {
+                System.out.println("Enter your new metric");
+                int ans1 = scan.nextInt();
+                n0.changeMetric("wwan0", ans1);
                 n0.turnOffNetwork("wwan0");
                 n0.turnOnNetwork("wwan0");
             }
-            else if (ans.equals("5")) {
+            else if (ans.equals("4.2")) {
+                System.out.println("Enter your new metric");
+                int ans1 = scan.nextInt();
+                n0.changeMetric("enp10s0", ans1);
+                n0.turnOffNetwork("enp10s0");
+                n0.turnOnNetwork("enp10s0");
+            }
+            else if (ans.equals("5.1")) {
+                n0.pingNetwork(n0.getNetworkList().get(1), 5);
+            }
+            else if (ans.equals("5.2")) {
                 n0.pingNetwork(n0.getNetworkList().get(0), 5);
             }
             else if (ans.equals("6")) {
@@ -48,12 +69,14 @@ public class CognitiveAdvantageUserInterface {
                 break;
             }
             else if (ans.equals("7")){
-                n0.sortNetworks();
+                // Will not work because cannot ping wwan0
+                //n0.sortNetworks();
                 for(Network network : n0.getNetworkList()) {
                     System.out.println(network.getName() + ":\navg latency: " + network.getLatency().get(1) + " ms\npacket loss: " + network.getPacketLoss() + " %\nmetric" + network.getMetric());
                 }
             }
             else if (ans.equals("8")){
+                // Will not work because cannot ping wwan0
                 n0.monitor(5);
             }
             else {
