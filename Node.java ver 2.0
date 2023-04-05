@@ -263,9 +263,27 @@ public class Node {
         ArrayList<String> in = new ArrayList<>();
         
         in = giveCommand(pingCmd);
-        String ping = in.get(pingTime-1);
-        //loop for extracting the data
-        String[] data = ping.split(" ");
+        if (net.getName().equals("wwan0")) {
+            //if ping wwan0
+            String ping1 = in.get(0);
+            String laten = "";
+            String[] data1 = ping1.split(" ");
+                for (int i = 0;i <= data1.length; i++) {
+                    if (data1[i].equals("packet")) {
+                        packetLoss = data1[i-1];
+                    }
+                    else if (data1[i].equals("time")) {
+                        laten = data1[i+1].split("m")[0];
+                        break;
+                    }
+                }
+                ArrayList<Double> latencyList = new ArrayList<>(List.of(Double.parseDouble(laten), Double.parseDouble(laten), Double.parseDouble(laten), Double.parseDouble(laten)));
+                net.setLatency(latencyList);
+                net.setPacketLoss(Double.parseDouble(packetLoss.substring(0, packetLoss.length()-1)));    
+        } else if (net.getName().equals("enp10s0")) {
+            String ping = in.get(pingTime-1);
+            //loop for extracting the data
+            String[] data = ping.split(" ");
             for (int i = 0;i <= data.length; i++) {
                 if (data[i].equals("packet")) {
                     packetLoss = data[i-1];
@@ -276,16 +294,18 @@ public class Node {
                     break;
                 }
             }
+            /*
             System.out.println(net + "\nPacket loss: " + packetLoss
                              + "\nmin latency: " + latency[0]
                              + "\naverage latency: " + latency[1]
                              + "\nmax latency: " + latency[2]
                              + "\nmdev latency: " + latency[3]);
-            
+            */
             ArrayList<Double> latencyList = new ArrayList<>(List.of(Double.parseDouble(latency[0]), Double.parseDouble(latency[1]), Double.parseDouble(latency[2]), Double.parseDouble(latency[3])));
             //set packet loss and latency
             net.setLatency(latencyList);
             net.setPacketLoss(Double.parseDouble(packetLoss.substring(0, packetLoss.length()-1)));
+        }
     }
     /**
      * Method to return a list of network
@@ -406,7 +426,7 @@ public class Node {
         printNetworkList();
     }
     public static void main(String[] args) {
-        Node n1 = new Node(...);
+        Node n1 = new Node("...");
         n1.init();
     }
 }
