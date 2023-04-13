@@ -1,11 +1,18 @@
 import java.util.*;
 import com.jcraft.jsch.*;
 import java.io.*;
+
 /**
- * A class that represent each Node that can connect to different types of network.
- * @author chitipat marsri
- * @version 04 Apr 2023
+ * C1
+ * Class 1: Node.java
+ * Description: A class that represent each Node that can connect to different types of network.
+ * @author: Chitipat Marsri
+ * Javadoc comments: Gobi Jegarajasingham
+ * @version: 2.0
+ * Date Updated: 04 Apr 2023
+ *
  */
+
 public class Node {
     //Attributes
     private int networkSize; //number of network

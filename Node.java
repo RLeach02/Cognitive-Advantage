@@ -1,24 +1,76 @@
-/**
- *
- * @author chitipatmarsri
- */
 import java.util.*;
 import com.jcraft.jsch.*;
 import java.io.*;
 
-public class Node {
-    //Attributes
-    private int networkSize = 2; //number of network
-    private ArrayList<Network> networkList = new ArrayList<>();
-    private JSch jsch;
-    private Session session;
-    private Channel channel;
+/**
+ * Class 1: Node.java
+ *
+ * A class that represent each Node that can connect to different types of network.
+ *
+ * @author: Chitipat Marsri
+ *
+ * @version: 2.0
+ *
+ * Date Updated: 04 Apr 2023
+ *
+ */
+
+public class Node_preMVP {
+
     /**
-     * Constructor of Node.java class that establish connection with Putty
+     * Attribute 1: networkSize
+     * Type: int
+     * Description Number of Networks
+     */
+
+    private int networkSize = 2; //number of network
+
+    /**
+     * Attribute 2: networkList
+     * Type: ArrayList<Network>
+     * Description: Stores a list of network bearers
+     */
+
+    private ArrayList<Network> networkList = new ArrayList<>();
+
+    /**
+     * Attribute 3: jsch
+     * Type: Jsch
+     * Description: Java implementation of SSH2, to connect to a SSH Server, using Port forwarding
+     * Requirement: import com.java.craft.jsch
+     */
+
+    private JSch jsch;
+
+    /**
+     * Attribute 4: session
+     * Type: Session
+     * Description: Enables connection to Linux Ubuntu Testbed server using PuTTY
+     */
+
+    private Session session;
+
+    /**
+     * Attribute 5: password
+     * Type: String
+     * Description: User password exists as an attribute as it is recurringly used, particularly in the sudo command
+     */
+
+    private String password;
+
+    // private Channel channel;
+    //Unsure about this attribute, no usages in the code, unsure on it's functionality
+
+    /**
+     * M1
+     * Method 1: Constructor of Node.java
+     * Description: Establishes connection with PuTTY
      * @param host
      * @param username
-     * @param password 
+     * @param password
+     *
      */
+
     public Node(String host, String username, String password) {
         try {
             jsch = new JSch();
@@ -34,11 +86,16 @@ public class Node {
             e.printStackTrace();
         }
     }
+
     /**
-     * This method will give the parameter command to the Putty
+     * M2
+     * Method 2: giveCommand
+     * Description: This method will parse relevant command through Putty into the Ubuntu Testbed
      * @param command string of command 
      * @return ArrayList<String> of the result from Putty
+     *
      */
+
     public ArrayList<String> giveCommand(String command) {
         ArrayList<String> out = new ArrayList<>();
         try {
@@ -62,8 +119,12 @@ public class Node {
         return out;
     }
     /**
-     * This method will paste the command to giveCommand method and extract the relevant information such as name, IP address, metric
+     * M3
+     * Method 3: getName_Metric_IP
+     * Description:  This method will paste the command to giveCommand method
+     * and extract the relevant information such as name, IP address and metrics
      * @param command string of command
+     *
      */
     public void getName_Metric_IP(String command) {
         String[] name = new String[networkSize];
@@ -90,10 +151,14 @@ public class Node {
         }  
     }
     /**
-     * This method will paste the command to giveCommand method and change the metric of a network
+     * M4
+     * Method 4: changeMetric
+     * Description: Pastes the command into Linux Ubuntu Testbed enabling the change of network metric
+     * Example: 100 -> 700 : In the case of high latency or packet loss
      * @param net a network that will change the metric
-     * @param command string of command
+     * @paaram command string of command
      * @param newMetric new metric number
+     *
      */
     public void changeMetric(Network net, String command, int newMetric) {
         ArrayList<String> in = new ArrayList<>();
@@ -101,10 +166,15 @@ public class Node {
         
     }
     /**
+     * M5
+     * Method 5: pingNetwork
+     * Description: Parses the ping commands to the giveCommand method and pings the required network
      * This method will paste the command to giveCommand method and ping the required network
      * @param net a network that will be pinged
      * @param pingTime the number of time to ping
+     *
      */
+
     public void pingNetwork(Network net, int pingTime) {
         String packetLoss = new String();
         String[] latency = new String[4];   
@@ -131,7 +201,10 @@ public class Node {
                              + "\nmdev latency: " + latency[3]);
     }
     /**
-     * This method will disconnect the Putty
+     * M6
+     * Method 6: disconnectSSHConnection
+     * Description: This method will disconnect from the Putty SSH connection
+     *
      */
     public void disconnectSSHConnection() {
         try {
@@ -140,6 +213,8 @@ public class Node {
             System.out.println(e.getMessage());
         }
     }
+
+    
     public void init() {
         String cmd = "ip route";
         getName_Metric_IP(cmd);
