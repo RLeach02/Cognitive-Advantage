@@ -5,13 +5,23 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 /**
- * A class that represent each type of Network and store its property.
- * @author chitipat marsri
- * @version 27 Mar 2023
+ * C1 
+ * Class 1: Represents each type of Network and stores it's properties and metrics 
+ * @author Citipat Mrsri 
+ * Javadoc comments by Gobi Jegarjasingham 
+ * @version 2.0 
+ * @date 27 Mar 2023
+ *
  */
-public class Network implements Comparable<Network> {
-    //Attributes
-    //network name
+ 
+public class Network implements Comparable<Network> 
+
+    /**
+    * A1
+    * Attribute 1: Network Name
+    *
+    */
+    
     private String name;
     //network IP address
     private String ipAddress;
