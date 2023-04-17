@@ -3,7 +3,7 @@ import com.jcraft.jsch.*;
 import java.io.*;
 
 /**
- * C1
+ * C2
  * Class 2: Node.java
  * Description: A class that represent each Node that can connect to different types of network.
  * @author: Chitipat Marsri
@@ -70,10 +70,12 @@ public class Node {
             jsch = new JSch();
             session = jsch.getSession(username, host, 22);
             session.setPassword(password);
+            
             // Disable strict host key checking
             java.util.Properties config = new java.util.Properties();
             config.put("StrictHostKeyChecking", "no");
             session.setConfig(config);
+            
             // Connect to the remote server
             session.connect();
         } catch (JSchException e) {
@@ -92,15 +94,18 @@ public class Node {
     public ArrayList<String> giveCommand(String command) {
         ArrayList<String> out = new ArrayList<>();
         try {
-            // Create a channel
+        
+            // Create a Channel
             Channel channel = session.openChannel("exec");
             ((ChannelExec)channel).setCommand(command);
             channel.setInputStream(null);
             ((ChannelExec)channel).setErrStream(System.err);
-            // connect channel
+            
+            // Connect channel
             InputStream in = channel.getInputStream();
             channel.connect();
-            //read the output
+            
+            // Read the Output 
             byte[] buffer = new byte[1024];
             while (in.read(buffer) != -1) {
                 String line = new String(buffer);
