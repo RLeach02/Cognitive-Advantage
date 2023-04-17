@@ -30,7 +30,7 @@ public class SynchronousQuery {
     * Description: Parses the name of the organisation as a variable 
     */ 
     
-    private static String org = "my-org";
+    private static String org = "edgespark";
 
 
     /** 
@@ -41,7 +41,7 @@ public class SynchronousQuery {
     
     public static void main(final String[] args) {
 
-        InfluxDBClient influxDBClient = InfluxDBClientFactory.create("http://localhost:8086", token, org);
+        InfluxDBClient influxDBClient = InfluxDBClientFactory.create("influxdb.edgespark.io", token, org);
 
         String flux = "from(bucket:\"my-bucket\") |> range(start: 0)";
 
