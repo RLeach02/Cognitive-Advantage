@@ -15,7 +15,7 @@ import java.io.*;
  *
  */
 
-public class Node_preMVP {
+public class Node {
 
     /**
      * Attribute 1: networkSize
