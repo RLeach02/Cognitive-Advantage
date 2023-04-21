@@ -270,14 +270,38 @@ public class testRegime {
         // Serial 16: sudo tc qdisc add dev enp11s0 root tbf rate 12mbit burst 6kbit latency 37.5ms
           // 125% Accepted Latency 
     
-      // Case 2: wwan0 - Wireless 5G Modem - Telstra 5G - 100% Bandwidth and 50% Max Burst Size 
+      // Case 2: wwan0 - Wireless 5G Modem - Telstra 5G - 100% Static Bandwidth and 50% Max Burst Size 
         // Serial 17: sudo tc qdisc add dev enp11s0 root tbf rate 12mbit burst 6kbit latency 15ms
           // 50% Accepted Latency 
         // Serial 18: sudo tc qdisc add dev enp11s0 root tbf rate 12mbit burst 6kbit latency 37.5ms
           // 125% Accepted Latency
     
     // Test 18: Latency Degradation @ 50% Static Bandwidth and 100% Max Burst Size 
-      // Case 1: enp11s0 - Ethernet - Starlink Satellite 
+      // Case 1: enp11s0 - Ethernet - Starlink Satellite - 50% Static Bandwidth and 100% Max Burst Size 
+        // Serial 19: sudo tc qdisc add dev enp11s0 root tbf rate 6mbit burst 6kbit latency 15ms 
+          // 50% Accepted Latency 
+        // Serial 20: sudo tc qdisc add dev enp11s0 root tbf rate 6mbit burst 6kbit latency 37.5ms 
+          // 125% Accepted Latency 
+    
+      // Case 2: wwan0 - Wireless 5G Modem - Telstra 5G - 50% Static Bandwidth and 100% Max Burst Size 
+        // Serial 21: sudo tc qdisc add dev wwan0 root tbf rate 6mbit burst 6kbit latency 15ms 
+          // 50% Accepted Latency 
+        // Serial 22: sudo tc qdisc add dev wwan0 root tbf rate 6mbit burst 6kbit latency 37.5ms 
+          // 125% Accepted Latency 
+      
+    // Test 20: Latency Degradation @ 50% Static Bandwidth and 50% Max Burst Size 
+      // Case 1: enp11s0 - Ethernet - Starlink Satellite - 50% Static Bandwidth and 50% Max Burst Size 
+        // Serial 23: sudo tc qdisc add dev enp11s0 root tbf rate 6mbit burst 3kbit latency 15ms 
+          // 50% Accepted Latency 
+        // Serial 24: sudo tc qdisc add dev enp11s0 root tbf rate 6mbit bust 3kbit latency 37.5ms 
+          // 125% Accepted Latency 
+    
+      // Case 2: wwan0 - Wireless 5G Modem - Telstra 5G - 50% Static Bandwidth and 50% Max Burst Size 
+        // Serial 25: sudo tc qdisc add dev wwan0 root tbf rate 6mbit burst 3kbit latency 15ms 
+          // 50% Accepted Latency 
+        // Serial 26: sudo tc qdisc add dev wwan0 root tbf rate 6mbit burst 3kbit latency 37.5ms 
+          // 125% Accepted Latency 
+        
   }  
   
   
