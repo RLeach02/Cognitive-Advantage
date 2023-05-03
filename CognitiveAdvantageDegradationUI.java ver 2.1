@@ -1,0 +1,227 @@
+import java.util.Scanner;
+
+/**
+ * A class that provide a basic user interface for degradation network.
+ * @author chitipat marsri
+ * @version 01 May 2023
+ */
+public class CognitiveAdvantageDegradationUI {
+    private Scanner scan =new Scanner(System.in);
+    private String ipAddr = "";
+    private String user = "";
+    private String password = "";
+    private Node n0 = new Node(ipAddr, user, password);
+    /**
+    * M4
+    * Method 4: degradeBandwidth 
+    * Description: Test 1: Bandwidth Degradation @ 100% & 50% Static performance 
+    * Case 1: enp11s0 - Ethernet - Starlink Satellite 
+    * Case 2: wwan0 - Wireless 5G Modem - Telstra 5G 
+    * Serial 1 - 4 
+    */ 
+    public void degradeBandwidth() {
+        // Case 1: enp11s0 - Ethernet - Starlink Satellite 
+            String serial1 = "tc qdisc add dev enp11s0 root tbf rate 12mbit"; 
+            n0.giveSudoCommand(serial1);
+            System.out.println("degrade successfully");
+            String serial2 = "tc qdisc add dev enp11s0 root tbf rate  6mbit";
+            n0.giveSudoCommand(serial2);
+            System.out.println("degrade successfully");
+        // Case 2: wwan0 - Wireless 5G Modem - Telstra 5G 
+            String serial3 = "tc qdisc add dev wwan0 root tbf rate 12mbit"; 
+            n0.giveSudoCommand(serial3);
+            System.out.println("degrade successfully");
+            String serial4 = "tc qdisc add dev wwan0 root tbf rate  6mbit";
+            n0.giveSudoCommand(serial4);
+            System.out.println("degrade successfully");
+    }
+
+    /** 
+    * M5
+    * Method 5: degradeBurst
+    * Description: Test 2 & 5 : Max Burst Size Degradation @ 100% & 50% Static Bandwidth 
+    * Case 1: enp11s0 - Ethernet - Starlink Satellite 
+    * Case 2: wwan0 - Wireless 5G Modem - Telstra 5G 
+    * Serial 5 - 8 
+    */ 
+    public void degradeBurst() {
+        // Test 3: Burst Size Degradation @ 100% Static Bandwidth 
+            // Case 1: enp11s0 - Ethernet - Starlink Satellite 
+                String serial5 = "tc qdisc add dev enp11s0 root tbf rate 12mbit burst 12kbit"; 
+                n0.giveSudoCommand(serial5);
+                System.out.println("degrade successfully");
+                String serial6 = "tc qdisc add dev enp11s0 root tbf rate 12mbit burst 6kbit";
+                n0.giveSudoCommand(serial6);
+                System.out.println("degrade successfully");
+          
+            // Case 2: wwan0 - Wireless 5G Modem - Telstra 5G 
+                String serial7 = "tc qdisc add dev wwan0 root tbf rate 12mbit burst 12kbit"; 
+                n0.giveSudoCommand(serial7);
+                System.out.println("degrade successfully");
+                String serial8 = "tc qdisc add dev wwan0 root tbf rate 12mbit burst 6kbit";
+                n0.giveSudoCommand(serial8);
+                System.out.println("degrade successfully");
+        // Test 5: Burst Size Degradation @ 50% Static Bandwidth 
+            // Case 1: enp11s0 - Ethernet - Starlink Satellite - 50% max burst size 
+                String serial9 = "tc qdisc add dev enp11s0 root tbf rate 6mbit burst 3kbit"; 
+                n0.giveSudoCommand(serial9);
+                System.out.println("degrade successfully");
+            //Case 2: wwan0 - Wireless 5G Modem - Telstra 5G - 50% max burst size 
+                String serial10 = "tc qdisc add dev wwan0 root tbf rate 6mbit burst 3kbit"; 
+                n0.giveSudoCommand(serial9);
+                System.out.println("degrade successfully");
+    }
+    /** 
+    * M6 
+    * Method 6: degradeLatency 
+    * Description: Test 10, 12, 18, 20
+    * Test Conditions: 100% & 50% Static Bandwidth, 100% & 50% Max Burst Size
+    * Latency Conditions: 50%, 125% of Accepted Latency 
+    */ 
+    public void degradeLatency() {
+        
+        // Test 10: Latency Degradation @ 100% Static Bandwidth and 100% Max Burst Size 
+            // Case 1: enp11s0 - Ethernet - Starlink Satellite - 100% Bandwidth, Max Burst Size
+                //50% Accepted Latency 
+                String serial11 = "tc qdisc add dev enp10s0 root tbf rate 12mbit burst 12kbit latency 15ms"; 
+                n0.giveSudoCommand(serial11);
+                System.out.println("degrade successfully");
+                String serial12 = "tc qdisc add dev enp11s0 root tbf rate 12mbit burst 12kbit latency 37.5ms";
+                n0.giveSudoCommand(serial12);
+                System.out.println("degrade successfully");
+                // 125% Accepted Latency 
+
+            // Case 2: wwan0 - Wireless 5G Modem - Telstra 5G - 100% Bandwidth, Max Burst Size 
+                // 50% Accepted Latency 
+                String serial13 = "tc qdisc add dev wwan0 root tbf rate 12mbit burst 12kbit latency 15ms";
+                n0.giveSudoCommand(serial13);
+                System.out.println("degrade successfully");
+                // 125% Accepted Latency 
+                String serial14 = "tc qdisc add dev wwan0 root tbf rate 12mbit burst 12kbit latency 37.5ms";
+                n0.giveSudoCommand(serial14);
+                System.out.println("degrade successfully");
+
+        // Test 12: Latency Degradation @ 100% Static Bandwidth and 50% Max Burst Size 
+            // Case 1: enp11s0 - Ethernet - Starlink Satellite - 100% Bandwidth, 50% Max Burst Size       
+                // 50% Accepted Latency 
+                String serial15 = "tc qdisc add dev enp11s0 root tbf rate 12mbit burst 6kbit latency 15ms";
+                n0.giveSudoCommand(serial15);
+                System.out.println("degrade successfully");
+                // 125% Accepted Latency 
+                String serial16 = "tc qdisc add dev enp11s0 root tbf rate 12mbit burst 6kbit latency 37.5ms";
+                n0.giveSudoCommand(serial16);
+                System.out.println("degrade successfully");
+
+            // Case 2: wwan0 - Wireless 5G Modem - Telstra 5G - 100% Static Bandwidth and 50% Max Burst Size 
+                // 50% Accepted Latency 
+                String serial17 = "tc qdisc add dev enp11s0 root tbf rate 12mbit burst 6kbit latency 15ms";
+                n0.giveSudoCommand(serial17);
+                System.out.println("degrade successfully");
+                // 125% Accepted Latency
+                String serial18 = "tc qdisc add dev enp11s0 root tbf rate 12mbit burst 6kbit latency 37.5ms";
+                n0.giveSudoCommand(serial18);
+                System.out.println("degrade successfully");
+
+        // Test 18: Latency Degradation @ 50% Static Bandwidth and 100% Max Burst Size 
+            // Case 1: enp11s0 - Ethernet - Starlink Satellite - 50% Static Bandwidth and 100% Max Burst Size  
+                // 50% Accepted Latency 
+                String serial19 = "tc qdisc add dev enp11s0 root tbf rate 6mbit burst 6kbit latency 15ms";
+                n0.giveSudoCommand(serial19);
+                System.out.println("degrade successfully");
+                // 125% Accepted Latency 
+                String serial20 = "tc qdisc add dev enp11s0 root tbf rate 6mbit burst 6kbit latency 37.5ms";
+                n0.giveSudoCommand(serial20);
+                System.out.println("degrade successfully");
+
+            // Case 2: wwan0 - Wireless 5G Modem - Telstra 5G - 50% Static Bandwidth and 100% Max Burst Size 
+                // 50% Accepted Latency
+                String serial21 = "tc qdisc add dev wwan0 root tbf rate 6mbit burst 6kbit latency 15ms";
+                n0.giveSudoCommand(serial21);
+                System.out.println("degrade successfully");
+                // 125% Accepted Latency
+                String serial22 = "tc qdisc add dev wwan0 root tbf rate 6mbit burst 6kbit latency 37.5ms";
+                n0.giveSudoCommand(serial22);
+                System.out.println("degrade successfully");
+
+        // Test 20: Latency Degradation @ 50% Static Bandwidth and 50% Max Burst Size 
+            // Case 1: enp11s0 - Ethernet - Starlink Satellite - 50% Static Bandwidth and 50% Max Burst Size 
+                // 50% Accepted Latency 
+                String serial23 = "tc qdisc add dev enp11s0 root tbf rate 6mbit burst 3kbit latency 15ms";
+                n0.giveSudoCommand(serial23);
+                System.out.println("degrade successfully");
+                // 125% Accepted Latency 
+                String serial24 = "tc qdisc add dev enp11s0 root tbf rate 6mbit bust 3kbit latency 37.5ms";
+                n0.giveSudoCommand(serial24);
+                System.out.println("degrade successfully");
+        
+            // Case 2: wwan0 - Wireless 5G Modem - Telstra 5G - 50% Static Bandwidth and 50% Max Burst Size 
+                // 50% Accepted Latency 
+                String serial25 = "tc qdisc add dev wwan0 root tbf rate 6mbit burst 3kbit latency 15ms";
+                //serial25 = "sudo tc qdisc add dev enp10s0 root tbf rate 6mbit burst 3kbit latency 15ms";
+                n0.giveSudoCommand(serial25);
+                System.out.println("degrade successfully");
+                // 125% Accepted Latency 
+                String serial26 = "tc qdisc add dev wwan0 root tbf rate 6mbit burst 3kbit latency 37.5ms";
+                //serial26 = "tc qdisc add dev enp10s0 root tbf rate 6mbit burst 3kbit latency 37.5ms";
+                n0.giveSudoCommand(serial26);
+                System.out.println("degrade successfully");
+    }
+    
+    public void degradeLatencyPacketLoss(String network, int delay, int loss) {
+        String cmd = "tc qdisc add dev " + network + " root netem delay " + delay + "ms loss " + loss + "%"; 
+        n0.giveSudoCommand(cmd);
+        System.out.println("degrade successfully");
+    }
+    public void restore(String network) {
+        String restoreCommand = "tc qdisc del dev " + network +" root";
+        n0.giveSudoCommand(restoreCommand);
+        System.out.println("restore successfully");
+    }
+    /** 
+    * Method:init 
+    * Description: Run all subsequent methods
+    */ 
+    public void init() {
+        n0.getName_Metric_IP();
+            while (true) {
+            System.out.println("""
+                               
+                               What do you want to do? (1-8 only)
+                               1: show network
+                               2: degrade latency and packet loss of the network
+                               3: test20
+                               9: restore network
+                               10: exit""");
+            String ans = scan.nextLine();
+            if (ans.equals("1")) {
+                System.out.println("There are " + n0.getNetworkListSize() + " network bearers");
+                n0.printNetworkList();
+            }
+            if (ans.equals("2")) {
+                degradeLatencyPacketLoss("enp10s0", 500, 10);
+            }
+            if (ans.equals("3")) {
+                degradeLatency();
+            }
+            else if (ans.equals("9")) {
+                restore("enp10s0");
+                restore("wwan0");
+            }
+            else if (ans.equals("10")) {
+                n0.disconnectSSHConnection();
+                break;
+            }
+            else {
+                System.out.println("Enter 1-10 only");
+            }
+        }
+    }
+    /** 
+    * Method: main 
+    * Description: Runs the init() method for the existing node with all subsequent methods as per the method's comments 
+    */ 
+    public static void main(String args[]) {
+        CognitiveAdvantageDegradationUI dUI = new CognitiveAdvantageDegradationUI();
+        dUI.init();
+    }
+}
