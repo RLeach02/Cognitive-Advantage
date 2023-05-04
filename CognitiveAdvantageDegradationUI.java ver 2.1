@@ -116,6 +116,7 @@ public class CognitiveAdvantageDegradationUI {
             default -> System.out.println("Invalid serial number");
         }
         n0.giveSudoCommand(serial);
+        System.out.println("degrade successfully");
     }
     /**
     * Method: degradeBandwidth 
@@ -367,7 +368,8 @@ public class CognitiveAdvantageDegradationUI {
                                3: find test case
                                4: restore enp10s0
                                5: restore wwan0
-                               6: exit""");
+                               6: ping current network
+                               7: exit""");
             String ans = scan.nextLine();
             if (ans.equals("1")) {
                 System.out.println("There are " + n0.getNetworkListSize() + " network bearers");
@@ -396,6 +398,9 @@ public class CognitiveAdvantageDegradationUI {
                 restore("wwan0");
             }
             else if (ans.equals("6")) {
+                n0.pingNetwork(n0.getNetworkList().get(0), 5);
+            }
+            else if (ans.equals("7")) {
                 n0.disconnectSSHConnection();
                 break;
             }
