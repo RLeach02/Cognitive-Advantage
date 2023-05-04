@@ -22,7 +22,10 @@ public class CognitiveAdvantageUserInterface {
     */ 
     public void init() {
         System.out.println("Welcome to Cognitive Advantage");
-        Node n0 = new Node("", "", "");
+        String ipAddr = ;
+        String user = ;
+        String password = ;
+        Node n0 = new Node(ipAddr, user, password);
         n0.getName_Metric_IP();
         while (true) {
             System.out.println("""
@@ -65,6 +68,7 @@ public class CognitiveAdvantageUserInterface {
                 n0.changeMetric("wwan0", ans1);
                 n0.turnOffNetwork("wwan0");
                 n0.turnOnNetwork("wwan0");
+                scan.nextLine();
             }
             else if (ans.equals("4.2")) {
                 System.out.println("Enter your new metric");
@@ -72,9 +76,7 @@ public class CognitiveAdvantageUserInterface {
                 n0.changeMetric("Wired connection 1", ans1);
                 n0.turnOffNetwork("Wired connection 1");
                 n0.turnOnNetwork("Wired connection 1");
-                //n0.changeMetric("enp10s0", ans1);
-                //n0.turnOffNetwork("enp10s0");
-                //n0.turnOnNetwork("enp10s0");
+                scan.nextLine();
             }
             else if (ans.equals("5.1")) {
                 n0.pingNetwork(n0.getNetworkList().get(1), 5);
