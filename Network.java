@@ -1,158 +1,72 @@
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+import java.util.Comparator;
 import java.util.Objects;
 /**
- * Class: Represents each type of Network and stores it's properties and metrics 
- * @author: Chitipat Marsri 
- * @Javadoc: comments by Gobi Jegarjasingham 
- * @create: 20 Mar 2023
- * @LastUpdate: 03 May 2023
- *
+ * A class that represent each type of Network and store its property.
+ * @author chitipat marsri
+ * @version 1.1 - 27 Mar 2023
  */
-public class Network implements Comparable<Network> {
+public class Network {
     //Attributes
-    /**
-    * Attribute name: Network Name
-    */
+    //network name
     private String name;
-    /** 
-    * Attribute ipAddress: Network IP Address
-    */
+    //network IP address
     private String ipAddress;
-    /** 
-    * Attribute metric: Network Metric 
-    */
-    private Integer metric;  
-    /**
-    * Attribute packetLoss: Packet Loss Metric 
-    */ 
-    private Double packetLoss;
-    /**
-    * Attribute latency: Latency Metric 
-    */ 
-    private ArrayList<Double> latency;
-    /**
-    * Attribute connectionName: name of the connection
-    */ 
-    private String connectionName;
-
-    /**
-     * Method: Constructor Method 
-     * Description: Instantiates the Network's name, IP Address and Metrics 
-     * @param nName
-     * @param ipAddress
-     * @param metric 
-     */
-    public Network(String nName, String ipAddress, Integer metric) {
-        this.name = nName;
+    //network metric
+    private Integer metric;
+    
+    //private String packetLoss;
+    //private ArrayList<Double> latency;
+    
+    public Network(String name, String ipAddress, Integer metric) {
+        this.name = name;
         this.ipAddress = ipAddress;
         this.metric = metric;
-        this.packetLoss = 1.00;
-        this.latency = new ArrayList<>();
+        //this.packetLoss = "";
+        //this.latency = new ArrayList<>();
     }
-    /**
-     * Method: getName 
-     * Description: Returns the Network Name
-     * @return Network Name
-     */
+
     public String getName() {
         return name;
     }
-    /**
-     * Method: getIpAdress
-     * Description: Returns the IP Address
-     * @return IP Address
-     */
+
     public String getIpAddress() {
         return ipAddress;
     }
-    /**
-     * Method: getMetric
-     * Description: Returns the metric 
-     * @return metric 
-     */
+
     public Integer getMetric() {
         return metric;
-    } 
-    /**
-     * Method: getPacketLoss() 
-     * Description: Returns the Packet Loss metric 
-     * @return Packet Loss metric 
-     */
-    public Double getPacketLoss() {
+    }
+    /*
+    public String getPacketLoss() {
         return packetLoss;
     }
-    /**
-     * Method: getConnectionName() 
-     * Description: Returns the name of connection
-     * @return name of connection
-     */
-    public String getConnectionName() {
-        return connectionName;
-    }
-    /**
-     * Method: getLatency 
-     * Description: Returns the Latency metric 
-     * @return Latency metric 
-     */
+    
     public ArrayList<Double> getLatency() {
         return latency;
     }
-    /**
-     * Method: setName 
-     * Description: Sets the name of the network 
-     * @param name name of the network 
-     */
+    */
     public void setName(String name) {
         this.name = name;
     }
-    /**
-     * Method: setIpAddress 
-     * Description: Sets the IP Address 
-     * @param ipAddress IP Address 
-     */
+
     public void setIpAddress(String ipAddress) {
         this.ipAddress = ipAddress;
     }
-    /**
-     * Method: setMetric
-     * Description Sets the Metric 
-     * @param metric Metric
-     */
+
     public void setMetric(Integer metric) {
         this.metric = metric;
     }
-    /**
-     * Method: setPacketLoss 
-     * Description: Sets the Packet loss metric 
-     * @param pac Packet loss metric
-     */
-    public void setPacketLoss(Double pac) {
+    /*
+    public void setPacketLoss(String pac) {
         this.packetLoss = pac;
     }
-    /**
-     * Method: setConnectionName 
-     * Description: Sets the name of the connection 
-     * @param connectionName name of the connection 
-     */
-    public void setConnectionName(String connectionName) {
-        this.connectionName = connectionName;
-    }
-    /**
-     * Method: setLatency 
-     * Description: Sets the Latency metrics 
-     * @param laten Latency metrics 
-     */
+    
     public void setLatency(ArrayList<Double> laten) {
         this.latency = laten;
     }
-    /**
-     * Method: equals 
-     * Description: Checks whether two network objects are equal
-     * @param obj object
-     * @return true if equal, false otherwise
-     */
+    */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -174,112 +88,18 @@ public class Network implements Comparable<Network> {
         if (!Objects.equals(this.metric, other.metric)) {
             return false;
         }
-        if (!Objects.equals(this.connectionName, other.connectionName)) {
-            return false;
-        }
         return true;
     }
-    /**
-     * Method: compareTo 
-     * Description: Compares two latency metrics together
-     * @param other other network
-     * @return int that indicate which network have higher latency
-     */
-    public int compareTo(Network other) {
-        return Double.compare(this.latency.get(1), other.latency.get(1));
-    }
-    /**
-     * Method: toString
-     * Description: print information about network
-     * @return Returns network <name> + <ipAddress> + <metric> 
-     */
+
     @Override
     public String toString() {
-        return "Network{" + "name=" + name + ", ipAddress=" + ipAddress + ", metric=" + metric +"}";
+        return "Network{" + "name=" + name + ", ipAddress=" + ipAddress + ", metric=" + metric + '}';
     }
-    /**
-     * Method: main 
-     * Description: Tests Constructor, toString and equal methods 
-     * @param args 
-     */
+    
     public static void main(String[] args) {
-        //test contructor, toString() and equal() method
-        Network n1 = new Network("wwan1", "1000000", 100);
-        Network n2 = new Network("wwan2", "2000000", 110);
-        Network n3 = new Network("wwan3", "3000000", 120);
-        Network n4 = new Network("wwan4", "4000000", 130);
-        Network n5 = new Network("wwan5", "5000000", 140);
+        Network n1 = new Network("wwan0", "1000000", 100);
+        Network n2 = new Network("wwan0", "1000000", 100);
         System.out.println(n1);
         System.out.println(n1.equals(n2));
-        
-        //test setLatency() and sort algorithm
-        ArrayList<Double> latencyList1 = new ArrayList<>(List.of(0.0, 40.3, 0.0, 0.0));
-        ArrayList<Double> latencyList2 = new ArrayList<>(List.of(0.0, 38.3, 0.0, 0.0));
-        ArrayList<Double> latencyList3 = new ArrayList<>(List.of(0.0, 35.5, 0.0, 0.0));
-        ArrayList<Double> latencyList4 = new ArrayList<>(List.of(0.0, 18.3, 0.0, 0.0));
-        ArrayList<Double> latencyList5 = new ArrayList<>(List.of(0.0, 155.5, 0.0, 0.0));
-        n1.setLatency(latencyList1);
-        n2.setLatency(latencyList2);
-        n3.setLatency(latencyList3);
-        n4.setLatency(latencyList4);
-        n5.setLatency(latencyList5);
-        n1.setPacketLoss(1.0);
-        n2.setPacketLoss(0.5);
-        n3.setPacketLoss(1.9);
-        n4.setPacketLoss(2.5);
-        n5.setPacketLoss(0.0);
-        List<Network> networks = new ArrayList<>();
-        networks.add(n1);
-        networks.add(n2);
-        networks.add(n3);
-        networks.add(n4);
-        networks.add(n5);
-        Collections.sort(networks);
-        for (Network network : networks) {
-            System.out.println(network.getName() + ": " + network.getLatency().get(1) + " ms" + "packet loss: " + network.getPacketLoss() + " %");
-        }
-        
-        
-        //Sorting algorithm
-        List<Network> sortedNetworks = new ArrayList<>();
-        List<Network> badNetworks = new ArrayList<>();
-        sortedNetworks = networks;
-        // First step: filter out networks with high latency or packet loss
-        for (Network network : sortedNetworks) {
-            if (network.getLatency().get(1) > 150 || network.getPacketLoss() > 2) {
-                badNetworks.add(network);
-            }
-        }
-        sortedNetworks.removeIf(network -> network.getLatency().get(1) > 150 || network.getPacketLoss() > 2);
-        // Second step: sort the remaining networks based on latency
-        Collections.sort(sortedNetworks);
-        // Third step: compare differences in latency and packet loss
-        for (int i = 0; i < sortedNetworks.size() - 1; i++) {
-            Network currentNetwork = sortedNetworks.get(i);
-            Network nextNetwork = sortedNetworks.get(i+1);
-            
-            double latencyDiff = nextNetwork.getLatency().get(1) - currentNetwork.getLatency().get(1);
-            double packetLossDiff = nextNetwork.getPacketLoss() - currentNetwork.getPacketLoss();
-            
-            if (latencyDiff <= 20) {
-                if (packetLossDiff < 0) {
-                    Collections.swap(sortedNetworks, i, i+1);
-                }
-            } 
-        }
-        for (Network network : badNetworks) {
-            sortedNetworks.add(network);
-        }
-        System.out.println("\n");
-        for (Network network : networks) {
-            System.out.println(network.getName() + ": " + network.getLatency().get(1) + " ms" + "packet loss: " + network.getPacketLoss() + " %");
-        }
-        // Fourth step: Change the Metric 
-        for (int i = 1; i < networks.size(); i++) {
-            networks.get(i).setMetric(networks.get(0).getMetric()+i);
-        }
-        for (Network network : networks) {
-            System.out.println(network.getName() + ": " + network.getLatency().get(1) + " ms" + "packet loss: " + network.getPacketLoss() + " %, metric" + network.getMetric());
-        }
     }
 }
