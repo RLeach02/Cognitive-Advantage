@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Objects;
 /**
  * C1 
+ * "TEST"
  * Class 1: Represents each type of Network and stores it's properties and metrics 
  * @author Citipat Mrsri 
  * Javadoc comments by Gobi Jegarjasingham 
