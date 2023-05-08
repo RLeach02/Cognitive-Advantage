@@ -7,58 +7,57 @@ import java.util.Scanner;
  * @author: Chitipat Marsri
  * @Javadoc Comments: Gobi Jegarajasingham
  * @create: 30 Mar 2023
- * @LastUpdate: 05 May 2023
+ * @LastUpdate: 08 May 2023
  */
 public class CognitiveAdvantageUserInterface {
     //scan to recieve input from user
-    Scanner scan =new Scanner(System.in);
+    private Scanner scan =new Scanner(System.in);
     /** 
     * Method:init 
     * Description: Run all subsequent methods
     */ 
     public void init() {
-        System.out.println("Welcome to Cognitive Advantage");
-        String ipAddr = "100.122.154.164";
-        String user = "pat";
-        String password = "Thunderpat123";
+        String ipAddr = ;
+        String user = ;
+        String password = ;
         Node n0 = new Node(ipAddr, user, password);
+        System.out.println("Welcome to Cognitive Advantage");
         n0.getName_Metric_IP();
         while (true) {
             System.out.println("""
-                               
-                               What do you want to do? (1-8 only)
-                               1: Show the network bearer list
-                               2.1: Turn off wwan0
-                               2.2: Turn off enp10s0
-                               3.1: Turn on wwan0
-                               3.2: Turn on enp10s0
-                               4.1: change metric wwan0
-                               4.2: change metric enp10s0
-                               5.1: quick ping the current network 
-                               5.2: mod ping the current network 
-                               6: exit 
-                               7: sort network bearers
-                               8: automatic change every 30 seconds""");
+                               **************************************************************
+                               * What do you want to do? (1-8 only)                         *
+                               * 1: Show the network bearer list                            *
+                               * 2: Turn off wwan0                                          *
+                               * 3: Turn off enp10s0                                        *
+                               * 4: Turn on wwan0                                           *
+                               * 5: Turn on enp10s0                                         *
+                               * 6: change metric wwan0                                     *
+                               * 7: change metric enp10s0                                   *
+                               * 8: quick ping the current network                          *
+                               * 9: mod ping the current network                            *
+                               * 10: automatic change every 30 seconds                      *
+                               * 11: sort network bearers                                   *
+                               * 12: exit                                                   *
+                               **************************************************************""");
             String ans = scan.nextLine();
             if (ans.equals("1")) {
                 System.out.println("There are " + n0.getNetworkListSize() + " network bearers");
                 n0.printNetworkList();
             }
-            else if (ans.equals("2.1")) {
+            else if (ans.equals("2")) {
                 n0.turnOffNetwork("wwan0");
             }
-            else if (ans.equals("2.2")) {
-                //n0.turnOffNetwork("enp10s0");
+            else if (ans.equals("3")) {
                 n0.turnOffNetwork("enp10s0");
             }
-            else if (ans.equals("3.1")) {
+            else if (ans.equals("4")) {
                 n0.turnOnNetwork("wwan0");
             }
-            else if (ans.equals("3.2")) {
-                //n0.turnOnNetwork("enp10s0");
+            else if (ans.equals("5")) {
                 n0.turnOnNetwork("enp10s0");
             }
-            else if (ans.equals("4.1")) {
+            else if (ans.equals("6")) {
                 try{
                     System.out.println("Enter your new metric");
                     int ans1 = scan.nextInt();
@@ -71,7 +70,7 @@ public class CognitiveAdvantageUserInterface {
                     scan.nextLine();
                 }
             }
-            else if (ans.equals("4.2")) {
+            else if (ans.equals("7")) {
                 try{
                     System.out.println("Enter your new metric");
                     int ans1 = scan.nextInt();
@@ -84,10 +83,10 @@ public class CognitiveAdvantageUserInterface {
                     scan.nextLine();
                 }
             }
-            else if (ans.equals("5.1")) {
+            else if (ans.equals("8")) {
                 n0.pingNetwork(n0.getNetworkList().get(0), 5);
             }
-            else if (ans.equals("5.2")) {     
+            else if (ans.equals("9")) {     
                 try{
                     System.out.println("Enter your ping time");
                     int ans1 = scan.nextInt();
@@ -98,15 +97,7 @@ public class CognitiveAdvantageUserInterface {
                     scan.nextLine();
                 }
             }
-            else if (ans.equals("6")) {
-                n0.disconnectSSHConnection();
-                break;
-            }
-            else if (ans.equals("7")){
-                n0.pingNetwork(n0.getNetworkList().get(0), 5);
-                n0.sortNetworks();
-            }
-            else if (ans.equals("8")){
+            else if (ans.equals("10")) {
                 try{
                     System.out.println("Enter the number of 30 seconds intervals you want to run");
                     int ans1 = scan.nextInt();
@@ -116,7 +107,15 @@ public class CognitiveAdvantageUserInterface {
                 } catch (InputMismatchException wrongType) {
                     System.out.println("Invalid input");
                     scan.nextLine();
-                }
+                }          
+            }
+            else if (ans.equals("11")){
+                n0.pingNetwork(n0.getNetworkList().get(0), 5);
+                n0.sortNetworks();
+            }
+            else if (ans.equals("12")){
+                n0.disconnectSSHConnection();
+                break;
             }
             else {
                 System.out.println("Invalid Input, please select available option only.");
