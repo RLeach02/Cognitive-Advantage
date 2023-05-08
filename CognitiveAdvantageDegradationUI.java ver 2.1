@@ -7,7 +7,7 @@ import java.util.Scanner;
  * @author: Chitipat Marsri
  * @Javadoc Comments: Chitipat Marsri
  * @create: 01 May 2023
- * @LastUpdate: 08 May 2023
+ * @LastUpdate: 09 May 2023
  */
 public class CognitiveAdvantageDegradationUI {
     private Scanner scan =new Scanner(System.in);
@@ -112,14 +112,18 @@ public class CognitiveAdvantageDegradationUI {
                                * 4: test case for enp10s0                                   *
                                * 5: restore enp10s0                                         *
                                * 6: restore wwan0                                           *
-                               * 7: quick ping current network                              *
+                               * 7: quick ping current network (100 times 0.01 interval)    *
                                * 8: mod ping the current network                            *
                                * 9: exit                                                    *
                                **************************************************************""");   
             String ans = scan.nextLine();
             if (ans.equals("1")) {
-                System.out.println("There are " + n0.getNetworkListSize() + " network bearers");
-                n0.printNetworkList();
+                try {
+                    System.out.println("There are " + n0.getNetworkListSize() + " network bearers");
+                    n0.printNetworkList();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
             else if (ans.equals("2")) {
                 try {
@@ -134,6 +138,8 @@ public class CognitiveAdvantageDegradationUI {
                 } catch (InputMismatchException wrongType) {
                     System.out.println("Invalid input");
                     scan.nextLine();
+                }catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
             else if (ans.equals("3")) {
@@ -145,6 +151,8 @@ public class CognitiveAdvantageDegradationUI {
                 } catch (InputMismatchException wrongType) {
                     System.out.println("Invalid input");
                     scan.nextLine();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
             else if (ans.equals("4")) {
@@ -156,31 +164,53 @@ public class CognitiveAdvantageDegradationUI {
                 } catch (InputMismatchException wrongType) {
                     System.out.println("Invalid input");
                     scan.nextLine();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
             else if (ans.equals("5")) {
-                restore("enp10s0");
+                try {
+                    restore("enp10s0");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
             else if (ans.equals("6")) {
-                restore("wwan0");
+                try {
+                    restore("wwan0");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
             else if (ans.equals("7")) {
-                n0.pingNetwork(n0.getNetworkList().get(0), 5);
+                try {
+                    n0.pingNetwork(n0.getNetworkList().get(0), 100, 0.01);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
             else if (ans.equals("8")) {
                 try {
                     System.out.println("Enter your ping time");
                     int ans1 = scan.nextInt();
-                    n0.pingNetwork(n0.getNetworkList().get(0), ans1);
+                    System.out.println("Enter your ping interval");
+                    double ans2 = scan.nextDouble();
+                    n0.pingNetwork(n0.getNetworkList().get(0), ans1, ans2);
                     scan.nextLine();
                 } catch (InputMismatchException wrongType) {
                     System.out.println("Invalid input");
                     scan.nextLine();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
             else if (ans.equals("9")) {
-                n0.disconnectSSHConnection();
-                break;
+                try {
+                    n0.disconnectSSHConnection();
+                    break;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
             else {
                 System.out.println("Invalid Input, please select available option only.");
