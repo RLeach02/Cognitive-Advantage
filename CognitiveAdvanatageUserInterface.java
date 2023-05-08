@@ -7,7 +7,7 @@ import java.util.Scanner;
  * @author: Chitipat Marsri
  * @Javadoc Comments: Gobi Jegarajasingham
  * @create: 30 Mar 2023
- * @LastUpdate: 08 May 2023
+ * @LastUpdate: 09 May 2023
  */
 public class CognitiveAdvantageUserInterface {
     //scan to recieve input from user
@@ -34,7 +34,7 @@ public class CognitiveAdvantageUserInterface {
                                * 5: Turn on enp10s0                                         *
                                * 6: change metric wwan0                                     *
                                * 7: change metric enp10s0                                   *
-                               * 8: quick ping the current network                          *
+                               * 8: quick ping the current network (100 times 0.01 interval)*
                                * 9: mod ping the current network                            *
                                * 10: automatic change every 30 seconds                      *
                                * 11: sort network bearers                                   *
@@ -42,20 +42,40 @@ public class CognitiveAdvantageUserInterface {
                                **************************************************************""");
             String ans = scan.nextLine();
             if (ans.equals("1")) {
-                System.out.println("There are " + n0.getNetworkListSize() + " network bearers");
-                n0.printNetworkList();
+                try {
+                    System.out.println("There are " + n0.getNetworkListSize() + " network bearers");
+                    n0.printNetworkList();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
             else if (ans.equals("2")) {
-                n0.turnOffNetwork("wwan0");
+                try {
+                    n0.turnOffNetwork("wwan0");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
             else if (ans.equals("3")) {
-                n0.turnOffNetwork("enp10s0");
+                try {
+                    n0.turnOffNetwork("enp10s0");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
             else if (ans.equals("4")) {
-                n0.turnOnNetwork("wwan0");
+                try {
+                    n0.turnOnNetwork("wwan0");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
             else if (ans.equals("5")) {
-                n0.turnOnNetwork("enp10s0");
+                try {
+                    n0.turnOnNetwork("enp10s0");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
             else if (ans.equals("6")) {
                 try{
@@ -68,6 +88,8 @@ public class CognitiveAdvantageUserInterface {
                 } catch (InputMismatchException wrongType) {
                     System.out.println("Invalid input");
                     scan.nextLine();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
             else if (ans.equals("7")) {
@@ -81,20 +103,30 @@ public class CognitiveAdvantageUserInterface {
                 } catch (InputMismatchException wrongType) {
                     System.out.println("Invalid input");
                     scan.nextLine();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
             else if (ans.equals("8")) {
-                n0.pingNetwork(n0.getNetworkList().get(0), 5);
+                try {
+                    n0.pingNetwork(n0.getNetworkList().get(0), 100, 0.01);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
             else if (ans.equals("9")) {     
                 try{
                     System.out.println("Enter your ping time");
                     int ans1 = scan.nextInt();
-                    n0.pingNetwork(n0.getNetworkList().get(0), ans1);
+                    System.out.println("Enter your ping interval");
+                    double ans2 = scan.nextDouble();
+                    n0.pingNetwork(n0.getNetworkList().get(0), ans1, ans2);
                     scan.nextLine();
                 } catch (InputMismatchException wrongType) {
                     System.out.println("Invalid input");
                     scan.nextLine();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
             else if (ans.equals("10")) {
@@ -107,15 +139,25 @@ public class CognitiveAdvantageUserInterface {
                 } catch (InputMismatchException wrongType) {
                     System.out.println("Invalid input");
                     scan.nextLine();
-                }          
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }       
             }
             else if (ans.equals("11")){
-                n0.pingNetwork(n0.getNetworkList().get(0), 5);
-                n0.sortNetworks();
+                try {
+                    n0.pingNetwork(n0.getNetworkList().get(0), 100, 0.01);
+                    n0.sortNetworks();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
             else if (ans.equals("12")){
-                n0.disconnectSSHConnection();
-                break;
+                try {
+                    n0.disconnectSSHConnection();
+                    break;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
             else {
                 System.out.println("Invalid Input, please select available option only.");
