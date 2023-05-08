@@ -1,15 +1,11 @@
-import java.util.*;
-import com.jcraft.jsch.*;
-import java.io.*;
-/**
- * TEST
+**
  * A class that represent each Node that can connect to different types of network.
  * @author chitipat marsri
- * @version 1.1 - 29 Mar 2023
+ * @version 1.3 - 30 Mar 2023
  */
 public class Node {
     //Attributes
-    private int networkSize = 2; //number of network
+    private int networkSize = 0; //number of network
     private ArrayList<Network> networkList = new ArrayList<>();
     private JSch jsch;
     private Session session;
@@ -70,29 +66,46 @@ public class Node {
      * @param command string of command
      */
     public void getName_Metric_IP(String command) {
-        String[] name = new String[networkSize];
-        String[] ip = new String[networkSize];
-        Integer[] metric = new Integer[networkSize];
+        ArrayList<String> name = new ArrayList<>();
+        ArrayList<String> ip = new ArrayList<>();
+        ArrayList<Integer> metric = new ArrayList<>();
+        
         ArrayList<String> in = new ArrayList<>();
         in = giveCommand(command);
         //loop for extracting data
-        for (int i = 0;i <= networkSize-1; i++) {     
-            String[] data = in.get(i).split(" ");
-            for (int j = 0;j <= data.length; j++) {
-                if (data[j].equals("dev")) {
-                    name[i] = data[j+1];
+        int count = 0;
+        int num = 0;
+        //loop for extracting data
+        while (num <= in.size()-1) {
+            String[] data = in.get(num).split(" ");
+            for (int j = 0;j <= data.length-1; j++) {
+                if (data[j].equals("default")){
+                    if (data[j+7].equals("metric")) {
+                        //create a Network from data and add into networkList
+                        ip.add(data[j+2]);
+                        name.add(data[j+4]);
+                        int met = Integer.parseInt(data[j+8]);
+                        metric.add(met);
+                        networkList.add(new Network(name.get(count), ip.get(count), metric.get(count))); //create Network object
+                        System.out.println("add succesful");
+                        count++;
+                    }
+                    else if (data[j+9].equals("metric")) {
+                        //create a Network from data and add into networkList
+                        ip.add(data[j+2]);
+                        name.add(data[j+4]);
+                        int met = Integer.parseInt(data[j+10]);
+                        metric.add(met);
+                        networkList.add(new Network(name.get(count), ip.get(count), metric.get(count))); //create Network object
+                        System.out.println("add succesful");
+                        count++;
+                    }
                 }
-                else if (data[j].equals("via")) {
-                    ip[i] = data[j+1];
-                }
-                else if (data[j].equals("metric")) {
-                    metric[i] = Integer.parseInt(data[j+1]);
-                    break;
-                }
-            }
-            //create a Network object and add to collection
-            networkList.add(new Network(name[i], ip[i], metric[i])); //create Network object
-        }  
+            } 
+            num++;
+        }
+        networkSize = count;
+        System.out.println("There are "+ networkSize+ " network");
     }
     /**
      * This method will paste the command to giveCommand method and change the metric of a network
@@ -186,19 +199,19 @@ public class Node {
     public void init() {
         String cmd = "ip route";
         getName_Metric_IP(cmd);
-        for (int i = 0;i <= networkSize-1; i++) {
-            System.out.println(networkList.get(i));
+        for (Network net : networkList) {
+            System.out.println(net);
         }
-        pingNetwork(networkList.get(0), 5);
+        //pingNetwork(networkList.get(0), 5);
         //turnOffNetwork(networkList.get(1));
         //timer(5);
         //turnOnNetwork(networkList.get(0));
         disconnectSSHConnection();
     }
     public static void main(String[] args) {
-        Node n1 = new Node("HOST IP ADDRESS", "USERNAME", "PASSWORD");
-        n1.init();
-        
+        Network n1 = new Network("wwan0", "1000000", 100);
+        Network n2 = new Network("wwan0", "1000000", 100);
+        System.out.println(n1);
+        System.out.println(n1.equals(n2));
     }
 }
-
