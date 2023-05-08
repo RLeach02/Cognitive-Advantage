@@ -7,8 +7,7 @@ import java.io.*;
  * @author: Chitipat Marsri
  * @Javadoc Comments: Gobi Jegarajasingham
  * @create: 20 Mar 2023
-   @Version 2.1
- * @LastUpdate: 05 May 2023
+ * @LastUpdate: 09 May 2023
  */
 public class Node {
     //Attributes
@@ -81,7 +80,7 @@ public class Node {
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
             String line;
             while ((line = reader.readLine()) != null) {
-                //System.out.println(line);
+                System.out.println(line);
                 out.add(line);
             }
             channel.disconnect();
@@ -113,7 +112,7 @@ public class Node {
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
             String line;
             while ((line = reader.readLine()) != null) {
-                //System.out.println(line);
+                System.out.println(line);
                 output.add(line);
             }
             channel.disconnect();
@@ -141,14 +140,13 @@ public class Node {
         //loop for extracting data
         while (num <= in.size()-1) {
             String[] data = in.get(num).split(" ");
-            for (int j = 0;j <= data.length-1; j++) {
-                if (data[j].equals("default")||data[j].equals("\ndefault")){
-                    if (data[j+7].equals("metric")) {
+            for (int i = 0;i <= data.length-1; i++) {
+                if (data[i].equals("default")||data[i].equals("\ndefault")){
+                    if (data[i+7].equals("metric")) {
                         //create a Network from data and add into networkList
-                        name.add(data[j+4]);
-                        int met = Integer.parseInt(data[j+8]);
+                        name.add(data[i+4]);
+                        int met = Integer.parseInt(data[i+8]);
                         metric.add(met);
-                        count++;
                     }
                 }
             } 
@@ -157,18 +155,50 @@ public class Node {
         //geting ip address
         in = giveCommand(command2);   
         //loop for extracting data
-        for (int j = 1;j <= name.size()+1; j++) {
-            String[] data = in.get(j).split(" ");
-            for (int k = 0;k < data.length; k++) {
-                if (data[0].equals(name.get(k))) {
+        for (int i = 0;i < name.size(); i++) {
+            String[] data = in.get(i+1).split(" ");
+            for (int j = 0;j < data.length; j++) {
+                if (data[0].equals(name.get(i))) {
                     String ipAddr = data[1].split("/")[0];
                     ip.add(ipAddr); 
-                    networkList.add(new Network(name.get(k), ip.get(k), metric.get(k))); //create Network object
+                    networkList.add(new Network(name.get(i), ipAddr, metric.get(i))); //create Network object
+                    count++;
+                    break;
                 }
             }
         }
+        updateNetworkList();
         networkSize = count;
     }     
+    /**
+     * Method: updateNetworkList
+     * Description: update network list
+     */
+    public void updateNetworkList() {
+        Collections.sort(networkList, Comparator.comparingInt(Network::getMetric));
+    }
+    /**
+     * Method: updateIpAddress
+     * Description: Update IP address for network
+     */
+    public void updateIpAddress() {
+        String command = "ip -o -4 addr show | awk '{print $2, $4}' && ip route show | awk '{print $1, $2, $5}'";
+        ArrayList<String> in = new ArrayList<>();        
+        //geting ip address
+        in = giveCommand(command);   
+        //loop for extracting data
+        for (int i = 0;i < networkList.size(); i++) {
+            String[] data = in.get(i+1).split(" ");
+            for (int j = 0;j < data.length; j++) {
+                if (data[0].equals(networkList.get(i).getName())) {
+                    String ipAddr = data[1].split("/")[0];   
+                    networkList.get(i).setIpAddress(ipAddr);
+                    break;
+                }
+            }
+        }
+        updateNetworkList();
+    }
     /**
     * Method: changeMetric
     * Description: Pastes the command1 to giveCommand method and changes the metric of a network 
@@ -245,20 +275,25 @@ public class Node {
         String command = "nmcli con up '" + networkName + "'";
         in = giveSudoCommand(command);
         System.out.println("Turn on " + networkName + " successfully");
+        updateIpAddress();
+        System.out.println("Update ip address successfully");
     }
     /**
     * Method: pingNetwork
     * Description: Pastes the command1 to giveCommand method and ping the required network
     * @param net a network that will be pinged
     * @param pingTime the number of time to ping
+     * @param pingInterval interval between each ping
     */
-    public void pingNetwork(Network net, int pingTime) {
+    public void pingNetwork(Network net, int pingTime, double pingInterval) {
         String targetIP = "1.1.1.1"; // Cloudflare
         String packetLoss = new String();
         String[] latency = new String[4];
-        String pingCmd = "ping -I " + net.getIpAddress() + " -c " + pingTime + " " + targetIP;
+        //String pingCmd = "ping -I " + net.getName() + " -c " + pingTime + " " + targetIP;
+        String pingCmd = "ping -I " + net.getName() + " -c " + pingTime + " -i "+ pingInterval + " " + targetIP;
         ArrayList<String> in = new ArrayList<>();
         
+        updateNetworkList();
         in = giveCommand(pingCmd);
         String ping = in.get(in.size()-2).concat(" ").concat(in.get(in.size()-1));
         //loop for extracting the data
@@ -313,8 +348,7 @@ public class Node {
     * Method: sortNetworks
     * Description: Sorts network list 
     */
-    public void sortNetworks() {
-        /*
+    public void sortNetworks() {   
         int latencyMax = 150; //max acceptable latency
         int plMax = 2; //max acceptable packet loss
         int acceptDiff = 20; //acceptable different between latency
@@ -326,43 +360,48 @@ public class Node {
                 badNetworks.add(network);
             }
         }
-        networkList.removeIf(network -> network.getLatency().get(1) > latencyMax || network.getPacketLoss() > plMax);
-        // Second step: sort the remaining networks based on latency
-        Collections.sort(networkList);
-        // Third step: compare differences in latency and packet loss
-        for (int i = 0; i < networkList.size() - 1; i++) {
-            Network currentNetwork = networkList.get(i);
-            Network nextNetwork = networkList.get(i+1);
-            
-            double latencyDiff = nextNetwork.getLatency().get(1) - currentNetwork.getLatency().get(1);
-            double packetLossDiff = nextNetwork.getPacketLoss() - currentNetwork.getPacketLoss();
-            
-            if (latencyDiff <= acceptDiff) {
-                if (packetLossDiff < 0) {
-                    Collections.swap(networkList, i, i+1);
-                }
-            } 
+        networkList.removeIf(network -> network.getLatency().get(1) > latencyMax || network.getPacketLoss() > plMax); 
+        if (!networkList.isEmpty()) {
+            // Second step: sort the remaining networks based on latency
+            Collections.sort(networkList);
+            // Third step: compare differences in latency and packet loss
+            for (int i = 0; i < networkList.size() - 1; i++) {
+                Network currentNetwork = networkList.get(i);
+                Network nextNetwork = networkList.get(i+1);
+
+                double latencyDiff = nextNetwork.getLatency().get(1) - currentNetwork.getLatency().get(1);
+                double packetLossDiff = nextNetwork.getPacketLoss() - currentNetwork.getPacketLoss();
+
+                if (latencyDiff <= acceptDiff) {
+                    if (packetLossDiff < 0) {
+                        Collections.swap(networkList, i, i+1);
+                    }
+                } 
+            }
         }
+        else {
+            // Second step: sort the networks based on latency if all of them are bad network
+            Collections.sort(badNetworks);
+            for (int i = 0; i < badNetworks.size() - 1; i++) {
+                Network currentNetwork = badNetworks.get(i);
+                Network nextNetwork = badNetworks.get(i+1);
+
+                double latencyDiff = nextNetwork.getLatency().get(1) - currentNetwork.getLatency().get(1);
+                double packetLossDiff = nextNetwork.getPacketLoss() - currentNetwork.getPacketLoss();
+
+                if (latencyDiff <= acceptDiff) {
+                    if (packetLossDiff < 0) {
+                        Collections.swap(badNetworks, i, i+1);
+                    }
+                } 
+            }
+        }        
         for (Network network : badNetworks) {
             networkList.add(network);
         }
         System.out.println("\n");
         for (Network network : networkList) {
             System.out.println(network.getName() + ": avg latency: " + network.getLatency().get(1) + " ms packet loss: " + network.getPacketLoss() + " % metric" + network.getMetric());
-        }
-        */
-        int latencyMax = 150; //max acceptable latency
-        int plMax = 2; //max acceptable packet loss
-        List<Network> badNetworks = new ArrayList<>();
-        //check packet loss to be less than 2%, latency < 150 ms
-        // First step: filter out networks with high latency or packet loss
-        if (networkList.get(0).getLatency().get(1) > latencyMax || networkList.get(0).getPacketLoss() > plMax) {
-            badNetworks.add(networkList.get(0));
-            networkList.remove(networkList.get(0));
-        }
-        // Second step: sort the remaining networks based on latency
-        for (Network network : badNetworks) {
-            networkList.add(network);
         }
     }
     /**
@@ -383,19 +422,39 @@ public class Node {
     * @param times 
     */
     public void monitor(int times) {
+        // reset the metric if hit 1000
+        int metricReset = 50;
         int pingTime = 10;
+        double pingInterval = 0.01;
+        int time = 10;
+        //reset metric if metric become large
+        if (networkList.get(0).getMetric() > 1000) {
+            for (int i = 1; i < networkList.size(); i++) {
+                changeMetric(networkList.get(i).getName(), metricReset+i);
+                turnOffNetwork(networkList.get(i).getName());
+                turnOnNetwork(networkList.get(i).getName());
+            }
+            changeMetric(networkList.get(0).getName(), metricReset);
+            turnOffNetwork(networkList.get(0).getName());
+            turnOnNetwork(networkList.get(0).getName());
+        }  
+        System.out.println("Start pinging");
         for (int n = 0; n < times; n++) {
-            pingNetwork(networkList.get(0), pingTime);
-                System.out.println(networkList.get(0) + "\tAVG latency:" + networkList.get(0).getLatency() + "\tpacket loss:" + networkList.get(0).getPacketLoss());
+            //ping network
+            for (Network network : networkList) {
+                pingNetwork(network, pingTime, pingInterval);
+            }
+            //sort network
             sortNetworks();
+            //change metric
             for (int i = 1; i < networkList.size(); i++) {
                 int newMetric =networkList.get(0).getMetric()+i;
                 changeMetric(networkList.get(i).getName(), newMetric);
                 turnOffNetwork(networkList.get(i).getName());
                 turnOnNetwork(networkList.get(i).getName());
-                System.out.println("Switch network to " + networkList.get(0));
             }
-            timer(30);
+            System.out.println("Switch network to " + networkList.get(0));
+            timer(time);
         }
     }
     /**
@@ -418,12 +477,13 @@ public class Node {
         getName_Metric_IP();
         printNetworkList();
         //test pingNetwork()
-        /*
-        pingNetwork(networkList.get(0), 5);
+        
+        pingNetwork(networkList.get(0), 100, 0.01);
         System.out.println(networkList.get(0).getLatency() + " \t" + networkList.get(0).getPacketLoss());
         networkList.get(0).setPacketLoss(15.0);
         System.out.println(networkList.get(0).getLatency() + " \t" + networkList.get(0).getPacketLoss());
         //test sortNetworkList()
+        /*
         sortNetworks();
         System.out.println("\n\n");
         printNetworkList();
@@ -434,8 +494,8 @@ public class Node {
         turnOnNetwork("wwan0");
         */
         //test monitor()
-        monitor(1);
-        printNetworkList();
+        //monitor(1);
+        //printNetworkList();
         disconnectSSHConnection();
         //printNetworkList();
     }
