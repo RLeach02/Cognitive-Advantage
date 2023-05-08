@@ -1,15 +1,18 @@
-**
+import java.util.*;
+import com.jcraft.jsch.*;
+import java.io.*;
+/**
  * A class that represent each Node that can connect to different types of network.
  * @author chitipat marsri
- * @version 1.3 - 30 Mar 2023
+ * @version 1.4 - 30 Mar 2023
  */
 public class Node {
     //Attributes
-    private int networkSize = 0; //number of network
+    private int networkSize; //number of network
     private ArrayList<Network> networkList = new ArrayList<>();
     private JSch jsch;
     private Session session;
-    private Channel channel;
+    private String password;
     /**
      * Constructor of Node.java class that establish connection with Putty
      * @param host
@@ -17,6 +20,8 @@ public class Node {
      * @param password 
      */
     public Node(String host, String username, String password) {
+        this.password = password;
+        networkSize = 0;
         //establish connection
         try {
             jsch = new JSch();
@@ -61,12 +66,54 @@ public class Node {
         }
         return out;
     }
+        /**
+     * This method will give sudo command to the Putty
+     * @param command string of command 
+     * @param sudoPassword password for sudo command
+     * @return ArrayList<String> of the result from Putty
+     */
+    public ArrayList<String> giveSudoCommand(String command, String sudoPassword) {
+        ArrayList<String> output = new ArrayList<>();
+        try {
+            // Create a channel
+            Channel channel = session.openChannel("exec");
+            ((ChannelExec) channel).setCommand("sudo -S -p '' " + command);
+            channel.setInputStream(null);
+            OutputStream out = channel.getOutputStream();
+            ((ChannelExec) channel).setErrStream(System.err);
+            InputStream in = channel.getInputStream();
+            ((ChannelExec) channel).setPty(true);
+            // connect channel
+            channel.connect();
+            // put in pass word
+            out.write((sudoPassword + "\n").getBytes());
+            out.flush();
+            byte[] tmp = new byte[1024];
+            while (true) {
+                while (in.available() > 0) {
+                    int i = in.read(tmp, 0, 1024);
+                    if (i < 0) break;
+                    String line = new String(tmp, 0, i);
+                    output.add(line);
+                    System.out.print(line);
+                }
+                if (channel.isClosed()) {
+                    //System.out.println("Exit status: " + channel.getExitStatus());
+                    break;
+                }
+            }
+            channel.disconnect();
+        } catch (JSchException | IOException e) {
+            e.printStackTrace();
+        }
+        return output;
+    }
     /**
      * This method will paste the command to giveCommand method and extract the relevant information such as name, IP address, metric
      * @param command string of command
      */
     public void getName_Metric_IP(String command) {
-        ArrayList<String> name = new ArrayList<>();
+                ArrayList<String> name = new ArrayList<>();
         ArrayList<String> ip = new ArrayList<>();
         ArrayList<Integer> metric = new ArrayList<>();
         
@@ -79,7 +126,8 @@ public class Node {
         while (num <= in.size()-1) {
             String[] data = in.get(num).split(" ");
             for (int j = 0;j <= data.length-1; j++) {
-                if (data[j].equals("default")){
+                
+                if (data[j].equals("default")||data[j].equals("\ndefault")){
                     if (data[j+7].equals("metric")) {
                         //create a Network from data and add into networkList
                         ip.add(data[j+2]);
@@ -87,7 +135,6 @@ public class Node {
                         int met = Integer.parseInt(data[j+8]);
                         metric.add(met);
                         networkList.add(new Network(name.get(count), ip.get(count), metric.get(count))); //create Network object
-                        System.out.println("add succesful");
                         count++;
                     }
                     else if (data[j+9].equals("metric")) {
@@ -97,7 +144,6 @@ public class Node {
                         int met = Integer.parseInt(data[j+10]);
                         metric.add(met);
                         networkList.add(new Network(name.get(count), ip.get(count), metric.get(count))); //create Network object
-                        System.out.println("add succesful");
                         count++;
                     }
                 }
@@ -127,22 +173,34 @@ public class Node {
      * @param net a required network
      */
     public void turnOffNetwork(Network net) {
-        String cmd = "sudo nmcli con down '" + net.getName() + "'";
-        //String cmd = "sudo ip link set " + net.getName() + " down";
         ArrayList<String> in = new ArrayList<>();
-        in = giveCommand(cmd);
-        System.out.println("Turn off " + net.getName() + " succesfully");
+        if (net.getName().contains("wwan")) {
+            String command = "nmcli con down '" + net.getName() + "'";
+            in = giveSudoCommand(command, password);
+        }
+        else if(net.getName().contains("enp")) {
+            String command = "ip link set " + net.getName() + " down";
+            in = giveSudoCommand(command, password);
+        }
+        System.out.println("Turn off " + net.getName() + " successfully");
     }
     /**
      * This method will turn the network on
      * @param net a required network
      */
     public void turnOnNetwork(Network net) {
-        String cmd = "sudo nmcli con up '" + net.getName() + "'";
-        //String cmd = "sudo ip link set " + net.getName() + " up";
         ArrayList<String> in = new ArrayList<>();
-        in = giveCommand(cmd);
-        System.out.println("Turn on " + net.getName() + " succesfully");
+        if (net.getName().contains("wwan")) {
+            String command = "nmcli con up '" + net.getName() + "'";
+            in = giveSudoCommand(command, password);
+        }
+        else if(net.getName().contains("enp")) {
+            String command = "ip link set " + net.getName() + " up";
+            in = giveSudoCommand(command, password);
+        }
+        String command = "ip link set enp10s0 up";
+        //in = giveSudoCommand(command, password);
+        System.out.println("Turn on " + net.getName() + " successfully");
     }
     /**
      * This method will be used to set a timer between each command
@@ -152,7 +210,7 @@ public class Node {
         try {
             Thread.sleep(second*1000); // 1000 milliseconds = 1 second
         } catch (InterruptedException e) {
-            // handle the exception if needed
+            e.getMessage();// handle the exception if needed
         }
     }
     /**
@@ -203,15 +261,13 @@ public class Node {
             System.out.println(net);
         }
         //pingNetwork(networkList.get(0), 5);
-        //turnOffNetwork(networkList.get(1));
-        //timer(5);
-        //turnOnNetwork(networkList.get(0));
+        turnOffNetwork(networkList.get(1));
+        timer(10);
+        turnOnNetwork(networkList.get(0));
         disconnectSSHConnection();
     }
     public static void main(String[] args) {
-        Network n1 = new Network("wwan0", "1000000", 100);
-        Network n2 = new Network("wwan0", "1000000", 100);
-        System.out.println(n1);
-        System.out.println(n1.equals(n2));
+        Node n1 = new Node("Host", "User", "Password");
+        n1.init();
     }
 }
