@@ -1,77 +1,27 @@
 import java.util.*;
 import com.jcraft.jsch.*;
 import java.io.*;
-
 /**
- * Class 1: Node.java
- *
+ * TEST
  * A class that represent each Node that can connect to different types of network.
- *
- * @author: Chitipat Marsri
- *
- * @version: 2.0
- *
- * Date Updated: 04 Apr 2023
- *
+ * @author chitipat marsri
+ * @version 1.1 - 29 Mar 2023
  */
-
 public class Node {
-
-    /**
-     * Attribute 1: networkSize
-     * Type: int
-     * Description Number of Networks
-     */
-
+    //Attributes
     private int networkSize = 2; //number of network
-
-    /**
-     * Attribute 2: networkList
-     * Type: ArrayList<Network>
-     * Description: Stores a list of network bearers
-     */
-
     private ArrayList<Network> networkList = new ArrayList<>();
-
-    /**
-     * Attribute 3: jsch
-     * Type: Jsch
-     * Description: Java implementation of SSH2, to connect to a SSH Server, using Port forwarding
-     * Requirement: import com.java.craft.jsch
-     */
-
     private JSch jsch;
-
-    /**
-     * Attribute 4: session
-     * Type: Session
-     * Description: Enables connection to Linux Ubuntu Testbed server using PuTTY
-     */
-
     private Session session;
-
+    private Channel channel;
     /**
-     * Attribute 5: password
-     * Type: String
-     * Description: User password exists as an attribute as it is recurringly used, particularly in the sudo command
-     */
-
-    private String password;
-
-    // private Channel channel;
-    //Unsure about this attribute, no usages in the code, unsure on it's functionality
-
-    /**
-     * M1
-     * Method 1: Constructor of Node.java
-     * Description: Establishes connection with PuTTY
+     * Constructor of Node.java class that establish connection with Putty
      * @param host
      * @param username
-     * @param password
-     *
+     * @param password 
      */
-
     public Node(String host, String username, String password) {
+        //establish connection
         try {
             jsch = new JSch();
             session = jsch.getSession(username, host, 22);
@@ -86,16 +36,11 @@ public class Node {
             e.printStackTrace();
         }
     }
-
     /**
-     * M2
-     * Method 2: giveCommand
-     * Description: This method will parse relevant command through Putty into the Ubuntu Testbed
+     * This method will give the parameter command to the Putty
      * @param command string of command 
      * @return ArrayList<String> of the result from Putty
-     *
      */
-
     public ArrayList<String> giveCommand(String command) {
         ArrayList<String> out = new ArrayList<>();
         try {
@@ -107,10 +52,12 @@ public class Node {
             // connect channel
             InputStream in = channel.getInputStream();
             channel.connect();
-            
+            //read the output
             byte[] buffer = new byte[1024];
             while (in.read(buffer) != -1) {
-                out.add(new String(buffer));
+                String line = new String(buffer);
+                out.add(line); //add output into ArrayList
+                System.out.println(line + "\n");
             }
             channel.disconnect();
         } catch (JSchException | IOException e) {
@@ -119,12 +66,8 @@ public class Node {
         return out;
     }
     /**
-     * M3
-     * Method 3: getName_Metric_IP
-     * Description:  This method will paste the command to giveCommand method
-     * and extract the relevant information such as name, IP address and metrics
+     * This method will paste the command to giveCommand method and extract the relevant information such as name, IP address, metric
      * @param command string of command
-     *
      */
     public void getName_Metric_IP(String command) {
         String[] name = new String[networkSize];
@@ -147,42 +90,72 @@ public class Node {
                     break;
                 }
             }
+            //create a Network object and add to collection
             networkList.add(new Network(name[i], ip[i], metric[i])); //create Network object
         }  
     }
     /**
-     * M4
-     * Method 4: changeMetric
-     * Description: Pastes the command into Linux Ubuntu Testbed enabling the change of network metric
-     * Example: 100 -> 700 : In the case of high latency or packet loss
+     * This method will paste the command to giveCommand method and change the metric of a network
      * @param net a network that will change the metric
-     * @paaram command string of command
      * @param newMetric new metric number
-     *
      */
-    public void changeMetric(Network net, String command, int newMetric) {
+    public void changeMetric(Network net, int newMetric) {
         ArrayList<String> in = new ArrayList<>();
-        in = giveCommand(command);
-        
+        //command for change a metric
+        String cmd = "sudo nmcli con edit wwan0 "
+                + "password"
+                + "set ipv4.route-metric 200"
+                + "save"
+                + "quit";
+        in = giveCommand(cmd);
     }
     /**
-     * M5
-     * Method 5: pingNetwork
-     * Description: Parses the ping commands to the giveCommand method and pings the required network
+     * This method will turn the network off
+     * @param net a required network
+     */
+    public void turnOffNetwork(Network net) {
+        String cmd = "sudo nmcli con down '" + net.getName() + "'";
+        //String cmd = "sudo ip link set " + net.getName() + " down";
+        ArrayList<String> in = new ArrayList<>();
+        in = giveCommand(cmd);
+        System.out.println("Turn off " + net.getName() + " succesfully");
+    }
+    /**
+     * This method will turn the network on
+     * @param net a required network
+     */
+    public void turnOnNetwork(Network net) {
+        String cmd = "sudo nmcli con up '" + net.getName() + "'";
+        //String cmd = "sudo ip link set " + net.getName() + " up";
+        ArrayList<String> in = new ArrayList<>();
+        in = giveCommand(cmd);
+        System.out.println("Turn on " + net.getName() + " succesfully");
+    }
+    /**
+     * This method will be used to set a timer between each command
+     * @param second 
+     */
+    public void timer(int second) {
+        try {
+            Thread.sleep(second*1000); // 1000 milliseconds = 1 second
+        } catch (InterruptedException e) {
+            // handle the exception if needed
+        }
+    }
+    /**
      * This method will paste the command to giveCommand method and ping the required network
      * @param net a network that will be pinged
      * @param pingTime the number of time to ping
-     *
      */
-
     public void pingNetwork(Network net, int pingTime) {
         String packetLoss = new String();
         String[] latency = new String[4];   
         String pingCmd = "ping -c " + pingTime + " " +  net.getIpAddress();
         ArrayList<String> in = new ArrayList<>();
+        
         in = giveCommand(pingCmd);
         String ping = in.get(pingTime-1);
-
+        //loop for extracting the data
         String[] data = ping.split(" ");
             for (int i = 0;i <= data.length; i++) {
                 if (data[i].equals("packet")) {
@@ -201,10 +174,7 @@ public class Node {
                              + "\nmdev latency: " + latency[3]);
     }
     /**
-     * M6
-     * Method 6: disconnectSSHConnection
-     * Description: This method will disconnect from the Putty SSH connection
-     *
+     * This method will disconnect the Putty
      */
     public void disconnectSSHConnection() {
         try {
@@ -213,8 +183,6 @@ public class Node {
             System.out.println(e.getMessage());
         }
     }
-
-    
     public void init() {
         String cmd = "ip route";
         getName_Metric_IP(cmd);
@@ -222,11 +190,9 @@ public class Node {
             System.out.println(networkList.get(i));
         }
         pingNetwork(networkList.get(0), 5);
-        
-        
-        
-        
-        
+        //turnOffNetwork(networkList.get(1));
+        //timer(5);
+        //turnOnNetwork(networkList.get(0));
         disconnectSSHConnection();
     }
     public static void main(String[] args) {
@@ -235,3 +201,4 @@ public class Node {
         
     }
 }
+
