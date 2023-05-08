@@ -1,17 +1,13 @@
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
-/**
- * A class that provide a basic user interface.
- * @author chitipat marsri
- * @version 04 Apr 2023
- */
 /**
  * Class: CognitiveAdvantageUserInterface.java
  * Description: A class that provide a basic user interface of node and network
  * @author: Chitipat Marsri
- * @Javadoc Comments: Chitipat Marsri
+ * @Javadoc Comments: Gobi Jegarajasingham
  * @create: 30 Mar 2023
- * @LastUpdate: 03 May 2023
+ * @LastUpdate: 05 May 2023
  */
 public class CognitiveAdvantageUserInterface {
     //scan to recieve input from user
@@ -22,9 +18,9 @@ public class CognitiveAdvantageUserInterface {
     */ 
     public void init() {
         System.out.println("Welcome to Cognitive Advantage");
-        String ipAddr = ;
-        String user = ;
-        String password = ;
+        String ipAddr = "100.122.154.164";
+        String user = "pat";
+        String password = "Thunderpat123";
         Node n0 = new Node(ipAddr, user, password);
         n0.getName_Metric_IP();
         while (true) {
@@ -63,42 +59,67 @@ public class CognitiveAdvantageUserInterface {
                 n0.turnOnNetwork("enp10s0");
             }
             else if (ans.equals("4.1")) {
-                System.out.println("Enter your new metric");
-                int ans1 = scan.nextInt();
-                n0.changeMetric("wwan0", ans1);
-                n0.turnOffNetwork("wwan0");
-                n0.turnOnNetwork("wwan0");
-                scan.nextLine();
+                try{
+                    System.out.println("Enter your new metric");
+                    int ans1 = scan.nextInt();
+                    n0.changeMetric("wwan0", ans1);
+                    n0.turnOffNetwork("wwan0");
+                    n0.turnOnNetwork("wwan0");
+                    scan.nextLine();
+                } catch (InputMismatchException wrongType) {
+                    System.out.println("Invalid input");
+                    scan.nextLine();
+                }
             }
             else if (ans.equals("4.2")) {
-                System.out.println("Enter your new metric");
-                int ans1 = scan.nextInt();
-                n0.changeMetric("enp10s0", ans1);
-                n0.turnOffNetwork("enp10s0");
-                n0.turnOnNetwork("enp10s0");
-                scan.nextLine();
+                try{
+                    System.out.println("Enter your new metric");
+                    int ans1 = scan.nextInt();
+                    n0.changeMetric("enp10s0", ans1);
+                    n0.turnOffNetwork("enp10s0");
+                    n0.turnOnNetwork("enp10s0");
+                    scan.nextLine();
+                } catch (InputMismatchException wrongType) {
+                    System.out.println("Invalid input");
+                    scan.nextLine();
+                }
             }
             else if (ans.equals("5.1")) {
                 n0.pingNetwork(n0.getNetworkList().get(0), 5);
             }
-            else if (ans.equals("5.2")) {
-                System.out.println("Enter your ping time");
-                int ans1 = scan.nextInt();
-                n0.pingNetwork(n0.getNetworkList().get(0), ans1);
-                scan.nextLine();
+            else if (ans.equals("5.2")) {     
+                try{
+                    System.out.println("Enter your ping time");
+                    int ans1 = scan.nextInt();
+                    n0.pingNetwork(n0.getNetworkList().get(0), ans1);
+                    scan.nextLine();
+                } catch (InputMismatchException wrongType) {
+                    System.out.println("Invalid input");
+                    scan.nextLine();
+                }
             }
             else if (ans.equals("6")) {
                 n0.disconnectSSHConnection();
                 break;
             }
             else if (ans.equals("7")){
+                n0.pingNetwork(n0.getNetworkList().get(0), 5);
                 n0.sortNetworks();
             }
             else if (ans.equals("8")){
-                n0.monitor(5);
+                try{
+                    System.out.println("Enter the number of 30 seconds intervals you want to run");
+                    int ans1 = scan.nextInt();
+                    n0.monitor(ans1);
+                    scan.nextLine();
+                    break;
+                } catch (InputMismatchException wrongType) {
+                    System.out.println("Invalid input");
+                    scan.nextLine();
+                }
             }
             else {
-                System.out.println("Enter 1-8 only");
+                System.out.println("Invalid Input, please select available option only.");
             }
         }
     }
