@@ -104,6 +104,10 @@ public class NetworkSelector {
         }
         return true;
     }
+    /** 
+    * Method: main 
+    * Description: main method to test the functionality of the class.
+    */ 
     public static void main(String[] args) {
         //test case
         Network n1 = new Network("net1", "1000000", 100);
