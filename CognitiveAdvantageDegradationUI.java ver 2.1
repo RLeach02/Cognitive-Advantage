@@ -7,11 +7,11 @@ import java.util.Scanner;
  * @author: Chitipat Marsri
  * @Javadoc Comments: Chitipat Marsri
  * @create: 01 May 2023
- * @LastUpdate: 09 May 2023
+ * @LastUpdate: 10 May 2023
  */
 public class CognitiveAdvantageDegradationUI {
     private Scanner scan =new Scanner(System.in);
-    private String ipAddr =;
+    private String ipAddr = ;
     private String user = ;
     private String password = ;
     private Node n0 = new Node(ipAddr, user, password);
@@ -114,7 +114,9 @@ public class CognitiveAdvantageDegradationUI {
                                * 6: restore wwan0                                           *
                                * 7: quick ping current network (100 times 0.01 interval)    *
                                * 8: mod ping the current network                            *
-                               * 9: exit                                                    *
+                               * 9: quick ping all (100 times 0.01 interval)                *
+                               * 10: mod ping all                                           *
+                               * 11: exit                                                   *
                                **************************************************************""");   
             String ans = scan.nextLine();
             if (ans.equals("1")) {
@@ -177,7 +179,7 @@ public class CognitiveAdvantageDegradationUI {
             }
             else if (ans.equals("6")) {
                 try {
-                    restore("wwan0");
+                    restore("wwx0e913bcfcd59");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -204,7 +206,29 @@ public class CognitiveAdvantageDegradationUI {
                     e.printStackTrace();
                 }
             }
-            else if (ans.equals("9")) {
+            else if (ans.equals("9")) {     
+                try{
+                    n0.pingAll(100, 0.01);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            else if (ans.equals("10")) {     
+                try{
+                    System.out.println("Enter your ping time");
+                    int ans1 = scan.nextInt();
+                    System.out.println("Enter your ping interval");
+                    double ans2 = scan.nextDouble();
+                    n0.pingAll(ans1, ans2);
+                    scan.nextLine();
+                } catch (InputMismatchException wrongType) {
+                    System.out.println("Invalid input");
+                    scan.nextLine();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            else if (ans.equals("11")) {
                 try {
                     n0.disconnectSSHConnection();
                     break;
