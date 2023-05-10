@@ -7,7 +7,7 @@ import java.util.Scanner;
  * @author: Chitipat Marsri
  * @Javadoc Comments: Gobi Jegarajasingham
  * @create: 30 Mar 2023
- * @LastUpdate: 09 May 2023
+ * @LastUpdate: 10 May 2023
  */
 public class CognitiveAdvantageUserInterface {
     //scan to recieve input from user
@@ -36,9 +36,11 @@ public class CognitiveAdvantageUserInterface {
                                * 7: change metric enp10s0                                   *
                                * 8: quick ping the current network (100 times 0.01 interval)*
                                * 9: mod ping the current network                            *
-                               * 10: automatic change every 30 seconds                      *
-                               * 11: sort network bearers                                   *
-                               * 12: exit                                                   *
+                               * 10: quick ping all (100 times 0.01 interval)               *
+                               * 11: mod ping all                                           *
+                               * 12: automatic change every 30 seconds                      *
+                               * 13: sort network bearers                                   *
+                               * 14: exit                                                   *
                                **************************************************************""");
             String ans = scan.nextLine();
             if (ans.equals("1")) {
@@ -129,13 +131,34 @@ public class CognitiveAdvantageUserInterface {
                     e.printStackTrace();
                 }
             }
-            else if (ans.equals("10")) {
+            else if (ans.equals("10")) {     
+                try{
+                    n0.pingAll(100, 0.01);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            else if (ans.equals("11")) {     
+                try{
+                    System.out.println("Enter your ping time");
+                    int ans1 = scan.nextInt();
+                    System.out.println("Enter your ping interval");
+                    double ans2 = scan.nextDouble();
+                    n0.pingAll(ans1, ans2);
+                    scan.nextLine();
+                } catch (InputMismatchException wrongType) {
+                    System.out.println("Invalid input");
+                    scan.nextLine();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            else if (ans.equals("12")) {
                 try{
                     System.out.println("Enter the number of 30 seconds intervals you want to run");
                     int ans1 = scan.nextInt();
                     n0.monitor(ans1);
                     scan.nextLine();
-                    break;
                 } catch (InputMismatchException wrongType) {
                     System.out.println("Invalid input");
                     scan.nextLine();
@@ -143,15 +166,15 @@ public class CognitiveAdvantageUserInterface {
                     e.printStackTrace();
                 }       
             }
-            else if (ans.equals("11")){
+            else if (ans.equals("13")){
                 try {
-                    n0.pingNetwork(n0.getNetworkList().get(0), 100, 0.01);
-                    n0.sortNetworks();
+                    n0.pingAll(100, 0.01);
+                    n0.networkSelection();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
-            else if (ans.equals("12")){
+            else if (ans.equals("14")){
                 try {
                     n0.disconnectSSHConnection();
                     break;
