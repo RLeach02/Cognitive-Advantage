@@ -98,10 +98,11 @@ public class CognitiveAdvantageDegradationUI {
     }
     /** 
     * Method:init 
-    * Description: Run all subsequent methods
+    * Description: Run all subsequent methods.
     */ 
     public void init() {
         n0.getName_Metric_IP();
+        n0.getConnectionName();
             while (true) {
             System.out.println("""
                                **************************************************************
@@ -179,7 +180,8 @@ public class CognitiveAdvantageDegradationUI {
             }
             else if (ans.equals("6")) {
                 try {
-                    restore("wwx0e913bcfcd59");
+                    restore("wwx0a8a48a35927"); 
+                    restore("wwan0");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -243,7 +245,7 @@ public class CognitiveAdvantageDegradationUI {
     }
     /** 
     * Method: main 
-    * Description: Runs the init() method for the existing node with all subsequent methods as per the method's comments 
+    * Description: Runs the init() method for the existing node with all subsequent methods as per the method's comments.
     */ 
     public static void main(String args[]) {
         CognitiveAdvantageDegradationUI dUI = new CognitiveAdvantageDegradationUI();
