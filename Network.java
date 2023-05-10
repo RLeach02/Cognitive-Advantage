@@ -5,10 +5,9 @@ import java.util.Objects;
 /**
  * Class: Represents each type of Network and stores it's properties and metrics 
  * @author: Chitipat Marsri 
- * @Javadoc: comments by Gobi Jegarjasingham 
+ * @Javadoc Comments:  Gobi Jegarjasingham & Chitipat Marsri
  * @create: 20 Mar 2023
  * @LastUpdate: 10 May 2023
- *
  */
 public class Network implements Comparable<Network> {
     //Attributes
@@ -29,8 +28,7 @@ public class Network implements Comparable<Network> {
     //Attribute normalizedPacketLoss: normalized packet loss
     private double normalizedPacketLoss;
     //Attribute weightedSum: wieghted sum
-    private double weightedSum;
-            
+    private double weightedSum;   
     /**
      * Method: Constructor Method 
      * Description: Instantiates the Network's name, IP Address and Metrics 
@@ -280,49 +278,6 @@ public class Network implements Comparable<Network> {
         Collections.sort(networks);
         for (Network network : networks) {
             System.out.println(network.getName() + ": " + network.getLatency().get(1) + " ms" + "packet loss: " + network.getPacketLoss() + " %");
-        }
-        
-        
-        //Sorting algorithm
-        List<Network> sortedNetworks = new ArrayList<>();
-        List<Network> badNetworks = new ArrayList<>();
-        sortedNetworks = networks;
-        // First step: filter out networks with high latency or packet loss
-        for (Network network : sortedNetworks) {
-            if (network.getLatency().get(1) > 150 || network.getPacketLoss() > 2) {
-                badNetworks.add(network);
-            }
-        }
-        sortedNetworks.removeIf(network -> network.getLatency().get(1) > 150 || network.getPacketLoss() > 2);
-        // Second step: sort the remaining networks based on latency
-        Collections.sort(sortedNetworks);
-        // Third step: compare differences in latency and packet loss
-        for (int i = 0; i < sortedNetworks.size() - 1; i++) {
-            Network currentNetwork = sortedNetworks.get(i);
-            Network nextNetwork = sortedNetworks.get(i+1);
-            
-            double latencyDiff = nextNetwork.getLatency().get(1) - currentNetwork.getLatency().get(1);
-            double packetLossDiff = nextNetwork.getPacketLoss() - currentNetwork.getPacketLoss();
-            
-            if (latencyDiff <= 20) {
-                if (packetLossDiff < 0) {
-                    Collections.swap(sortedNetworks, i, i+1);
-                }
-            } 
-        }
-        for (Network network : badNetworks) {
-            sortedNetworks.add(network);
-        }
-        System.out.println("\n");
-        for (Network network : networks) {
-            System.out.println(network.getName() + ": " + network.getLatency().get(1) + " ms" + "packet loss: " + network.getPacketLoss() + " %");
-        }
-        // Fourth step: Change the Metric 
-        for (int i = 1; i < networks.size(); i++) {
-            networks.get(i).setMetric(networks.get(0).getMetric()+i);
-        }
-        for (Network network : networks) {
-            System.out.println(network.getName() + ": " + network.getLatency().get(1) + " ms" + "packet loss: " + network.getPacketLoss() + " %, metric" + network.getMetric());
         }
     }
 }
