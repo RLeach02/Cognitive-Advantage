@@ -5,7 +5,7 @@ import java.util.Scanner;
  * Class: CognitiveAdvantageUserInterface.java
  * Description: A class that provide a basic user interface of node and network
  * @author: Chitipat Marsri
- * @Javadoc Comments: Gobi Jegarajasingham
+ * @Javadoc Comments: Gobi Jegarajasingham & Chitipat Marsri
  * @create: 30 Mar 2023
  * @LastUpdate: 10 May 2023
  */
@@ -14,7 +14,7 @@ public class CognitiveAdvantageUserInterface {
     private Scanner scan =new Scanner(System.in);
     /** 
     * Method:init 
-    * Description: Run all subsequent methods
+    * Description: Run all subsequent methods.
     */ 
     public void init() {
         String ipAddr = ;
@@ -23,6 +23,7 @@ public class CognitiveAdvantageUserInterface {
         Node n0 = new Node(ipAddr, user, password);
         System.out.println("Welcome to Cognitive Advantage");
         n0.getName_Metric_IP();
+        n0.getConnectionName();
         while (true) {
             System.out.println("""
                                **************************************************************
@@ -189,7 +190,7 @@ public class CognitiveAdvantageUserInterface {
     }
     /** 
     * Method: main 
-    * Description: Runs the init() method for the existing node with all subsequent methods as per the method's comments 
+    * Description: Runs the init() method for the existing node with all subsequent methods as per the method's comments.
     */ 
     public static void main(String[] args) {
         CognitiveAdvantageUserInterface ui = new CognitiveAdvantageUserInterface();
