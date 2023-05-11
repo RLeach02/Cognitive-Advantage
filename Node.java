@@ -99,7 +99,7 @@ public class Node {
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
             String line;
             while ((line = reader.readLine()) != null) {
-                System.out.println(line);
+                //System.out.println(line);
                 output.add(line);
             }
             channel.disconnect();
@@ -462,9 +462,9 @@ public class Node {
         // reset the metric if hit 1000
         int metricReset = 50;
         int maxMetric = 1000;
-        int pingTime = 100;
-        double pingInterval = 0.01;
-        int time = 15;
+        int pingTime = 1000;
+        double pingInterval = 10.0/pingTime;
+        int time = 5;
         //reset metric if metric become large
         if (networkList.get(0).getMetric() > maxMetric) {
             changeMetric(networkList.get(0).getName(), metricReset);
@@ -476,6 +476,7 @@ public class Node {
                 turnOnNetwork(networkList.get(i).getConnectionName());
             }
         }
+        //ping the networks
         System.out.println("Start pinging");
         for (int n = 0; n < times; n++) {
             //ping network
@@ -489,7 +490,7 @@ public class Node {
                 turnOffNetwork(networkList.get(i).getConnectionName());
                 turnOnNetwork(networkList.get(i).getConnectionName());
             }
-            System.out.println("Switch network to " + networkList.get(0));
+            System.out.println("Using " + networkList.get(0));
             timer(time);
         }
     }
