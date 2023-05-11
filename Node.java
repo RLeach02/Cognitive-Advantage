@@ -7,7 +7,7 @@ import java.io.*;
  * @author: Chitipat Marsri
  * @Javadoc Comments: Gobi Jegarajasingham & Chitipat Marsri
  * @create: 20 Mar 2023
- * @LastUpdate: 10 May 2023
+ * @LastUpdate: 11 May 2023
  */
 public class Node {
     //Attributes
@@ -455,7 +455,7 @@ public class Node {
     }
     /**
     * Method: monitor 
-    * Description: Automatically change network
+    * Description: Automatically change network for a period of time.
     * @param times 
     */
     public void monitor(int times) {
@@ -476,10 +476,50 @@ public class Node {
                 turnOnNetwork(networkList.get(i).getConnectionName());
             }
         }
-        //ping the networks
-        System.out.println("Start pinging");
+        //iteration
         for (int n = 0; n < times; n++) {
             //ping network
+            System.out.println("\nStart pinging");
+            pingAll(pingTime, pingInterval);
+            //sort network
+            networkSelection();
+            //change metric
+            for (int i = 1; i < networkList.size(); i++) {
+                int newMetric =networkList.get(0).getMetric()+i;
+                changeMetric(networkList.get(i).getConnectionName(), newMetric);
+                turnOffNetwork(networkList.get(i).getConnectionName());
+                turnOnNetwork(networkList.get(i).getConnectionName());
+            }
+            System.out.println("Using " + networkList.get(0));
+            timer(time);
+        }
+    }
+    /**
+    * Method: fullyAutomation
+    * Description: Automatically change network until the user terminate the program.
+    */
+    public void fullyAutomation() {
+        // reset the metric if hit 1000
+        int metricReset = 50;
+        int maxMetric = 1000;
+        int pingTime = 1000;
+        double pingInterval = 10.0/pingTime;
+        int time = 5;
+        //reset metric if metric become large
+        if (networkList.get(0).getMetric() > maxMetric) {
+            changeMetric(networkList.get(0).getName(), metricReset);
+            turnOffNetwork(networkList.get(0).getName());
+            turnOnNetwork(networkList.get(0).getName());
+            for (int i = 1; i < networkList.size(); i++) {
+                changeMetric(networkList.get(i).getConnectionName(), metricReset+i);
+                turnOffNetwork(networkList.get(i).getConnectionName());
+                turnOnNetwork(networkList.get(i).getConnectionName());
+            }
+        }
+        //iteration
+        while (true) {
+            //ping network
+            System.out.println("\nStart pinging");
             pingAll(pingTime, pingInterval);
             //sort network
             networkSelection();
@@ -514,6 +554,7 @@ public class Node {
         getName_Metric_IP();
         printNetworkList();
         getConnectionName();
+        //fullyAutomation();
         //updateMetric();
         //System.out.println("Update metric successful");
         //test pingNetwork()
