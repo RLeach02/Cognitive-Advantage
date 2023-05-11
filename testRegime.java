@@ -1,312 +1,255 @@
-import java.util.*; 
-import com.jcraft.jsch.*; 
-import java.io.*; 
+import java.util.InputMismatchException;
+import java.util.Scanner;
 
-// Change to java file to demonstrate push / pull request 
-
-/** 
-* C3 
-* Class 3: testRegime.java 
-* Description: A consolidated test regime for the active part of the Dynamic Network Selection program
-* Features: 22 Serials to adequately demonstratic dynamic switching between network interfaces 
-* Enables: Java program to parse through serials in the format of 'sudo tc' linux commands 
-* Demonstration: Run even more consolidated serials to display network interface swithcing faster
-* 
-*/ 
-
-public class testRegime {
-  
-  /** 
-  * A1
-  * Attribute 1: bw 
-  * Description: Bandwidth is instantiated as a variable to enable the alteration of serial conditions 
-  * Reason: This will enable the developer / experienced operator to ascertain whether the software application
-  * will switch based on very specific parameters 
-  */ 
-  
-  private bw; 
-  
-  /** 
-  * A2
-  * Attribute 2: maxBurst
-  * Description: Max Burst Size is instantiated as a variable to enable the alteration of serial conditions 
-  * Reason: This will enable the developer / experienced operator to ascertain whether the software application
-  * will switch based on very specific parameters 
-  */ 
-  
-  private maxBurst; 
-  
-  /** 
-  * A3
-  * Attribute 3: latencyDegradation
-  * Description: Max Burst Size is instantiated as a variable to enable the alteration of serial conditions 
-  * Reason: This will enable the developer / experienced operator to ascertain whether the software application
-  * will switch based on very specific parameters.
-  * The paramters of max burst to test % degradation 
-  */ 
-  
-  /** 
-  * Extract from Node.java 
-  * Instantiates an SSH connection to the testbed in the same method as Node.java 
-  */ 
-  
-  private latencyDegradation; 
-  
-  /** 
-  * A4
-  * Attribute 4: jsch 
-  * Description: Java implementation of SSH 2 that enables connection to an SSH server 
-  */ 
-  
-  private Jsch jsch; 
-  
-  /**
-  * A5 
-  * Attribute 5: session 
-  * Description: Initialises a session with the testbed through the Java implementation of SSH
-  */ 
-  
-  private Session session; 
-  
-  /**
-  * A5 
-  * Attribute 5: password 
-  * Description: Provides the program the password credential to access the testbed 
-  */ 
-  
-  private String password; 
-  
-  /** 
-  * M1 
-  * Method 1: Constructor of testRefime that establishes connection with PuTTY 
-  * Description: Connects the java program to the Limux Ubuntu testbed server 
-  * @param host 
-  * @param username 
-  * @param password
-  */ 
-  
-  public Node(String host, String username, String password) {
-        this.password = password;
-        networkSize = 0;
-        //establish connection
-    
-        try {
-            jsch = new JSch();
-            session = jsch.getSession(username, host, 22);
-            session.setPassword(password);
-            
-            // Disable strict host key checking
-            java.util.Properties config = new java.util.Properties();
-            config.put("StrictHostKeyChecking", "no");
-            session.setConfig(config);
-            
-            // Connect to the remote server
-            session.connect();
-        } catch (JSchException e) {
-            e.printStackTrace();
-        }
-    
-     /**
-     * M2
-     * Method 2: This method will parse required commands through PuTTY
-     * Description: Gives the testbed commands to extract the network names, set metrics, packet loss and latency 
-     * @param command string of command 
-     * @return ArrayList<String> of the result from Putty
-     */
-     
-    public ArrayList<String> giveCommand(String command) {
-        ArrayList<String> out = new ArrayList<>();
-        try {
-        
-            // Create a Channel
-            Channel channel = session.openChannel("exec");
-            ((ChannelExec)channel).setCommand(command);
-            channel.setInputStream(null);
-            ((ChannelExec)channel).setErrStream(System.err);
-            
-            // Connect channel
-            InputStream in = channel.getInputStream();
-            channel.connect();
-            
-            // Read the Output 
-            byte[] buffer = new byte[1024];
-            while (in.read(buffer) != -1) {
-                String line = new String(buffer);
-                out.add(line); 
-            //add output into ArrayList
-            //System.out.println(line + "\n");
-            }
-            channel.disconnect();
-        } catch (JSchException | IOException e) {
-            e.printStackTrace();
-        }
-        return out;
-    }
-    
+/**
+ * Class: CognitiveAdvantageDegredationUI.java
+ * Description: A class that provide a basic user interface for degradation network.
+ * @author: Chitipat Marsri
+ * @Javadoc Comments: Chitipat Marsri
+ * @create: 01 May 2023
+ * @LastUpdate: 10 May 2023
+ */
+public class CognitiveAdvantageDegradationUI {
+    private Scanner scan =new Scanner(System.in);
+    private String ipAddr = ;
+    private String user = ;
+    private String password = ;
+    private Node n0 = new Node(ipAddr, user, password);
     /**
-     * M3
-     * Method 3: giveSudoCommand
-     * Description: Parses sudo commands to the testbed through PuTTY 
-     * @param command string of command 
-     * @param sudoPassword password for sudo command
-     * @return ArrayList<String> of the result from Putty
+     * Method: fixDegradation
+     * Description: provide a test case for quick degradation
+     * @param networkName name of network
+     * @param serialNum serial number
      */
-     
-    public ArrayList<String> giveSudoCommand(String command, String sudoPassword) {
-        ArrayList<String> output = new ArrayList<>();
-        try {
-        
-            // Create a channel
-            Channel channel = session.openChannel("exec");
-            ((ChannelExec) channel).setCommand("sudo -S -p '' " + command);
-            /**
-            * Chitipat Marsri: Please explain the process of Java parsing linux commands 
-            * Explain how it is parsed, and how the output is read / collected 
-            */ 
-            channel.setInputStream(null);
-            OutputStream out = channel.getOutputStream();
-            ((ChannelExec) channel).setErrStream(System.err);
-            InputStream in = channel.getInputStream();
-            ((ChannelExec) channel).setPty(true);
+    public void fixDegradation(String networkName, int serialNum) {
+        String serial = "";
+            //latency only
+            String serial1 = "tc qdisc add dev " + networkName + " root netem delay 10ms"; 
+            String serial2 = "tc qdisc add dev " + networkName + " root netem delay 25ms"; 
+            String serial3 = "tc qdisc add dev " + networkName + " root netem delay 50ms"; 
+            String serial4 = "tc qdisc add dev " + networkName + " root netem delay 75ms"; 
+            String serial5 = "tc qdisc add dev " + networkName + " root netem delay 100ms"; 
+            String serial6 = "tc qdisc add dev " + networkName + " root netem delay 125ms"; 
+            String serial7 = "tc qdisc add dev " + networkName + " root netem delay 150ms"; 
+            //latency with 10% packet loss
+            String serial8 = "tc qdisc add dev " + networkName + " root netem delay 10ms loss 10%"; 
+            String serial9 = "tc qdisc add dev " + networkName + " root netem delay 25ms loss 10%"; 
+            String serial10 = "tc qdisc add dev " + networkName + " root netem delay 50ms loss 10%";
+            String serial11 = "tc qdisc add dev " + networkName + " root netem delay 75ms loss 10%";      
+            String serial12 = "tc qdisc add dev " + networkName + " root netem delay 100ms loss 10%"; 
+            String serial13 = "tc qdisc add dev " + networkName + " root netem delay 125ms loss 10%"; 
+            String serial14 = "tc qdisc add dev " + networkName + " root netem delay 150ms loss 10%"; 
+            //latency with 20% packet loss
+            String serial15 = "tc qdisc add dev " + networkName + " root netem delay 10ms loss 20%"; 
+            String serial16 = "tc qdisc add dev " + networkName + " root netem delay 25ms loss 20%"; 
+            String serial17 = "tc qdisc add dev " + networkName + " root netem delay 50ms loss 20%";
+            String serial18 = "tc qdisc add dev " + networkName + " root netem delay 75ms loss 20%";      
+            String serial19 = "tc qdisc add dev " + networkName + " root netem delay 100ms loss 20%"; 
+            String serial20 = "tc qdisc add dev " + networkName + " root netem delay 125ms loss 20%"; 
+            String serial21 = "tc qdisc add dev " + networkName + " root netem delay 150ms loss 20%"; 
             
-            // Connects the channel
-            channel.connect();
-            
-            // Puts in the Password
-            out.write((sudoPassword + "\n").getBytes());
-            out.flush();
-            byte[] tmp = new byte[1024];
+        switch (serialNum) {
+            case 1 -> serial = serial1;
+            case 2 -> serial = serial2;
+            case 3 -> serial = serial3;
+            case 4 -> serial = serial4;
+            case 5 -> serial = serial5;
+            case 6 -> serial = serial6;
+            case 7 -> serial = serial7;
+            case 8 -> serial = serial8;
+            case 9 -> serial = serial9;
+            case 10 -> serial = serial10;
+            case 11 -> serial = serial11;
+            case 12 -> serial = serial12;
+            case 13 -> serial = serial13;
+            case 14 -> serial = serial14;
+            case 15 -> serial = serial15;
+            case 16 -> serial = serial16;
+            case 17 -> serial = serial17;
+            case 18 -> serial = serial18;
+            case 19 -> serial = serial19;
+            case 20 -> serial = serial20;
+            case 21 -> serial = serial21;
+            default -> System.out.println("Invalid serial number");
+        }
+        n0.giveSudoCommand(serial);
+        System.out.println("degrade successfully");
+    }
+    /**
+     * Method: modDegradation
+     * Description: degrade a network's latency and packet loss
+     * @param networkName name network 
+     * @param delay additional delay
+     * @param packetLoss packet loss
+     */
+    public void modDegradation(String networkName, int delay, int packetLoss) {
+        String cmd = "tc qdisc add dev " + networkName + " root netem delay " + delay + "ms loss " + packetLoss + "%"; 
+        n0.giveSudoCommand(cmd);
+        System.out.println("degrade successfully");
+    }
+    /**
+     * Method: restore
+     * Description: restore network to its original state
+     * @param network network name
+     */
+    public void restore(String network) {
+        String restoreCommand = "tc qdisc del dev " + network +" root";
+        n0.giveSudoCommand(restoreCommand);
+        System.out.println("restore successfully");
+    }
+    /** 
+    * Method:init 
+    * Description: Run all subsequent methods.
+    */ 
+    public void init() {
+        n0.getName_Metric_IP();
+        n0.getConnectionName();
             while (true) {
-                while (in.available() > 0) {
-                    int i = in.read(tmp, 0, 1024);
-                    if (i < 0) break;
-                    String line = new String(tmp, 0, i);
-                    output.add(line);
-                    //System.out.print(line);
-                }
-                if (channel.isClosed()) {
-                    //System.out.println("Exit status: " + channel.getExitStatus());
-                    break;
+            System.out.println("""
+                               **************************************************************
+                               * What do you want to do? (1-8 only)                         *
+                               * 1: show network                                            *
+                               * 2: degrade latency and packet loss of the network          *
+                               * 3: test case for wwan0                                     *
+                               * 4: test case for enp10s0                                   *
+                               * 5: restore enp10s0                                         *
+                               * 6: restore wwan0                                           *
+                               * 7: quick ping current network (100 times 0.01 interval)    *
+                               * 8: mod ping the current network                            *
+                               * 9: quick ping all (100 times 0.01 interval)                *
+                               * 10: mod ping all                                           *
+                               * 11: exit                                                   *
+                               **************************************************************""");   
+            String ans = scan.nextLine();
+            if (ans.equals("1")) {
+                try {
+                    System.out.println("There are " + n0.getNetworkListSize() + " network bearers");
+                    n0.printNetworkList();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
-            channel.disconnect();
-        } catch (JSchException | IOException e) {
-            e.printStackTrace();
+            else if (ans.equals("2")) {
+                try {
+                    System.out.println("Enter network");
+                    String ans1 = scan.nextLine();
+                    System.out.println("Enter delay");
+                    int ans2 = scan.nextInt();
+                    System.out.println("Enter packet loss");
+                    int ans3 = scan.nextInt();
+                    modDegradation(ans1, ans2, ans3);
+                    scan.nextLine();
+                } catch (InputMismatchException wrongType) {
+                    System.out.println("Invalid input");
+                    scan.nextLine();
+                }catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            else if (ans.equals("3")) {
+                try {
+                    System.out.println("Choose your test case (1-21)");
+                    int testNum = scan.nextInt();
+                    fixDegradation("wwan0", testNum);
+                    scan.nextLine();
+                } catch (InputMismatchException wrongType) {
+                    System.out.println("Invalid input");
+                    scan.nextLine();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            else if (ans.equals("4")) {
+                try {
+                    System.out.println("Choose your test case (1-21)");
+                    int testNum = scan.nextInt();
+                    fixDegradation("enp10s0", testNum);
+                    scan.nextLine();
+                } catch (InputMismatchException wrongType) {
+                    System.out.println("Invalid input");
+                    scan.nextLine();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            else if (ans.equals("5")) {
+                try {
+                    restore("enp10s0");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            else if (ans.equals("6")) {
+                try {
+                    restore("wwx0a8a48a35927"); 
+                    restore("wwan0");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            else if (ans.equals("7")) {
+                try {
+                    n0.pingNetwork(n0.getNetworkList().get(0), 100, 0.01);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            else if (ans.equals("8")) {
+                try {
+                    System.out.println("Enter your ping time");
+                    int ans1 = scan.nextInt();
+                    System.out.println("Enter your ping interval");
+                    double ans2 = scan.nextDouble();
+                    n0.pingNetwork(n0.getNetworkList().get(0), ans1, ans2);
+                    scan.nextLine();
+                } catch (InputMismatchException wrongType) {
+                    System.out.println("Invalid input");
+                    scan.nextLine();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            else if (ans.equals("9")) {     
+                try{
+                    n0.pingAll(100, 0.01);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            else if (ans.equals("10")) {     
+                try{
+                    System.out.println("Enter your ping time");
+                    int ans1 = scan.nextInt();
+                    System.out.println("Enter your ping interval");
+                    double ans2 = scan.nextDouble();
+                    n0.pingAll(ans1, ans2);
+                    scan.nextLine();
+                } catch (InputMismatchException wrongType) {
+                    System.out.println("Invalid input");
+                    scan.nextLine();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            else if (ans.equals("11")) {
+                try {
+                    n0.disconnectSSHConnection();
+                    break;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            else {
+                System.out.println("Invalid Input, please select available option only.");
+            }
         }
-        return output;
     }
-    
-  /**
-  * M4
-  * Method 4: degradeBandwidth 
-  * Description: Test 1: Bandwidth Degradation @ 100% & 50% Static performance 
-  * Case 1: enp11s0 - Ethernet - Starlink Satellite 
-  * Case 2: wwan0 - Wireless 5G Modem - Telstra 5G 
-  * Serial 1 - 4 
-  */ 
-  
-  public String degradeBandwidth { 
-    //Test 1: Bandiwdth Degradation 
-      // Case 1: enp11s0 - Ethernet - Starlink Satellite 
-        // Serial 1: sudo tc qdisc add dev enp11s0 root tbf rate 12mbit
-        // Serial 2: sudo tc qdisc add dev enp11s0 root tbf rate  6mbit
-    
-      // Case 2: wwan0 - Wireless 5G Modem - Telstra 5G 
-        // Serial 3: sudo tc qdisc add dev wwan0 root tbf rate 12mbit
-        // Serial 4: sudo tc qdisc add dev wwan0 root tbf rate  6mbit
-        
-  }
-    
-  /** 
-  * M5
-  * Method 5: degradeBurst
-  * Description: Test 2 & 5 : Max Burst Size Degradation @ 100% & 50% Static Bandwidth 
-  * Case 1: enp11s0 - Ethernet - Starlink Satellite 
-  * Case 2: wwan0 - Wireless 5G Modem - Telstra 5G 
-  * Serial 5 - 8 
-  */ 
-    
-  public String degradeBurst { 
-    // Test 3: Burst Size Degradation @ 100% Static Bandwidth 
-      // Case 1: enp11s0 - Ethernet - Starlink Satellite 
-        // Serial 5: sudo tc qdisc add dev enp11s0 root tbf rate 12mbit burst 12kbit 
-        // Serial 6: sudo tc qdisc add dev enp11s0 root tbf rate 12mbit burst 6kbit
-      // Case 2: wwan0 - Wireless 5G Modem - Telstra 5G 
-        // Serial 7: sudo tc qdisc add dev wwan0 root tbf rate 12mbit burst 12kbit 
-        // Serial 8: sudo tc qdisc add dev wwan0 root tbf rate 12mbit burst 6kbit 
-    
-    // Test 5: Burst Size Degradation @ 50% Static Bandwidth 
-      // Case 1: enp11s0 - Ethernet - Starlink Satellite - 50% max burst size 
-        // Serial 9: sudo tc qdisc add dev enp11s0 root tbf rate 6mbit burst 3kbit
-      //Case 2: wwan0 - Wireless 5G Modem - Telstra 5G - 50% max burst size 
-        // Serial 10: sudo tc qdisc add dev wwan0 root tbf rate 6mbit burst 3kbit 
-    
-  } 
-  
-  /** 
-  * M6 
-  * Method 6: degradeLatency 
-  * Description: Test 10, 12, 18, 20
-  * Test Conditions: 100% & 50% Static Bandwidth, 100% & 50% Max Burst Size
-  * Latency Contitions: 50%, 125% of Accepted Latency 
-  */ 
-  
-  public String degradeLatency { 
-    // Test 10: Latency Degradation @ 100% Static Bandwidth and 100% Max Burst Size 
-      // Case 1: enp11s0 - Ethernet - Starlink Satellite - 100% Bandwidth, Max Burst Size
-        // Serial 11: sudo tc qdisc add dev enp11s0 root tbf rate 12mbit burst 12kbit latency 15ms
-          // 50% Accepted Latency 
-        // Serial 12: sudo tc qdisc add dev enp11s0 root tbf rate 12mbit burst 12kbit latency 37.5ms
-          // 125% Accepted Latency 
-    
-      // Case 2: wwan0 - Wireless 5G Modem - Telstra 5G - 100% Bandwidth, Max Burst Size 
-        // Serial 13: sudo tc qdisc add dev wwan0 root tbf rate 12mbit burst 12kbit latency 15ms 
-          // 50% Accepted Latency 
-        // Serial 14: sudo tc qdisc add dev wwan0 root tbf rate 12mbit burst 12kbit latency 37.5ms
-          // 125% Accepted Latency 
-    
-    // Test 12: Latency Degradation @ 100% Static Bandwidth and 50% Max Burst Size 
-      // Case 1: enp11s0 - Ethernet - Starlink Satellite - 100% Bandwidth, 50% Max Burst Size 
-        // Serial 15: sudo tc qdisc add dev enp11s0 root tbf rate 12mbit burst 6kbit latency 15ms
-          // 50% Accepted Latency 
-        // Serial 16: sudo tc qdisc add dev enp11s0 root tbf rate 12mbit burst 6kbit latency 37.5ms
-          // 125% Accepted Latency 
-    
-      // Case 2: wwan0 - Wireless 5G Modem - Telstra 5G - 100% Static Bandwidth and 50% Max Burst Size 
-        // Serial 17: sudo tc qdisc add dev enp11s0 root tbf rate 12mbit burst 6kbit latency 15ms
-          // 50% Accepted Latency 
-        // Serial 18: sudo tc qdisc add dev enp11s0 root tbf rate 12mbit burst 6kbit latency 37.5ms
-          // 125% Accepted Latency
-    
-    // Test 18: Latency Degradation @ 50% Static Bandwidth and 100% Max Burst Size 
-      // Case 1: enp11s0 - Ethernet - Starlink Satellite - 50% Static Bandwidth and 100% Max Burst Size 
-        // Serial 19: sudo tc qdisc add dev enp11s0 root tbf rate 6mbit burst 6kbit latency 15ms 
-          // 50% Accepted Latency 
-        // Serial 20: sudo tc qdisc add dev enp11s0 root tbf rate 6mbit burst 6kbit latency 37.5ms 
-          // 125% Accepted Latency 
-    
-      // Case 2: wwan0 - Wireless 5G Modem - Telstra 5G - 50% Static Bandwidth and 100% Max Burst Size 
-        // Serial 21: sudo tc qdisc add dev wwan0 root tbf rate 6mbit burst 6kbit latency 15ms 
-          // 50% Accepted Latency 
-        // Serial 22: sudo tc qdisc add dev wwan0 root tbf rate 6mbit burst 6kbit latency 37.5ms 
-          // 125% Accepted Latency 
-      
-    // Test 20: Latency Degradation @ 50% Static Bandwidth and 50% Max Burst Size 
-      // Case 1: enp11s0 - Ethernet - Starlink Satellite - 50% Static Bandwidth and 50% Max Burst Size 
-        // Serial 23: sudo tc qdisc add dev enp11s0 root tbf rate 6mbit burst 3kbit latency 15ms 
-          // 50% Accepted Latency 
-        // Serial 24: sudo tc qdisc add dev enp11s0 root tbf rate 6mbit bust 3kbit latency 37.5ms 
-          // 125% Accepted Latency 
-    
-      // Case 2: wwan0 - Wireless 5G Modem - Telstra 5G - 50% Static Bandwidth and 50% Max Burst Size 
-        // Serial 25: sudo tc qdisc add dev wwan0 root tbf rate 6mbit burst 3kbit latency 15ms 
-          // 50% Accepted Latency 
-        // Serial 26: sudo tc qdisc add dev wwan0 root tbf rate 6mbit burst 3kbit latency 37.5ms 
-          // 125% Accepted Latency 
-        
-  }  
-  
-  
-
-  } 
-} 
+    /** 
+    * Method: main 
+    * Description: Runs the init() method for the existing node with all subsequent methods as per the method's comments.
+    */ 
+    public static void main(String args[]) {
+        CognitiveAdvantageDegradationUI dUI = new CognitiveAdvantageDegradationUI();
+        dUI.init();
+    }
+}
