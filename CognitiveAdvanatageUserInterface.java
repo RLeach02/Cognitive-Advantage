@@ -7,7 +7,7 @@ import java.util.Scanner;
  * @author: Chitipat Marsri
  * @Javadoc Comments: Gobi Jegarajasingham & Chitipat Marsri
  * @create: 30 Mar 2023
- * @LastUpdate: 10 May 2023
+ * @LastUpdate: 11 May 2023
  */
 public class CognitiveAdvantageUserInterface {
     //scan to recieve input from user
@@ -39,9 +39,10 @@ public class CognitiveAdvantageUserInterface {
                                * 9: mod ping the current network                            *
                                * 10: quick ping all (100 times 0.01 interval)               *
                                * 11: mod ping all                                           *
-                               * 12: automatic change every 30 seconds                      *
-                               * 13: sort network bearers                                   *
-                               * 14: exit                                                   *
+                               * 12: sort network bearers                                   *
+                               * 13: iterate the selection program every 30 seconds         *
+                               * 14: fully automate the selection program                   *
+                               * 15: exit                                                   *
                                **************************************************************""");
             String ans = scan.nextLine();
             if (ans.equals("1")) {
@@ -154,7 +155,15 @@ public class CognitiveAdvantageUserInterface {
                     e.printStackTrace();
                 }
             }
-            else if (ans.equals("12")) {
+            else if (ans.equals("12")){
+                try {
+                    n0.pingAll(100, 0.01);
+                    n0.networkSelection();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            else if (ans.equals("13")) {
                 try{
                     System.out.println("Enter the number of 30 seconds intervals you want to run");
                     int ans1 = scan.nextInt();
@@ -167,15 +176,14 @@ public class CognitiveAdvantageUserInterface {
                     e.printStackTrace();
                 }       
             }
-            else if (ans.equals("13")){
-                try {
-                    n0.pingAll(100, 0.01);
-                    n0.networkSelection();
+            else if (ans.equals("14")) {
+                try{
+                    n0.fullyAutomation();
                 } catch (Exception e) {
                     e.printStackTrace();
-                }
+                }       
             }
-            else if (ans.equals("14")){
+            else if (ans.equals("15")){
                 try {
                     n0.disconnectSSHConnection();
                     break;
