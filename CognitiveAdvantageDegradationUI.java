@@ -7,7 +7,7 @@ import java.util.Scanner;
  * @author: Chitipat Marsri
  * @Javadoc Comments: Chitipat Marsri
  * @create: 01 May 2023
- * @LastUpdate: 10 May 2023
+ * @LastUpdate: 11 May 2023
  */
 public class CognitiveAdvantageDegradationUI {
     private Scanner scan =new Scanner(System.in);
@@ -23,52 +23,19 @@ public class CognitiveAdvantageDegradationUI {
      */
     public void fixDegradation(String networkName, int serialNum) {
         String serial = "";
-            //latency only
-            String serial1 = "tc qdisc add dev " + networkName + " root netem delay 10ms"; 
-            String serial2 = "tc qdisc add dev " + networkName + " root netem delay 25ms"; 
-            String serial3 = "tc qdisc add dev " + networkName + " root netem delay 50ms"; 
-            String serial4 = "tc qdisc add dev " + networkName + " root netem delay 75ms"; 
-            String serial5 = "tc qdisc add dev " + networkName + " root netem delay 100ms"; 
-            String serial6 = "tc qdisc add dev " + networkName + " root netem delay 125ms"; 
-            String serial7 = "tc qdisc add dev " + networkName + " root netem delay 150ms"; 
-            //latency with 10% packet loss
-            String serial8 = "tc qdisc add dev " + networkName + " root netem delay 10ms loss 10%"; 
-            String serial9 = "tc qdisc add dev " + networkName + " root netem delay 25ms loss 10%"; 
-            String serial10 = "tc qdisc add dev " + networkName + " root netem delay 50ms loss 10%";
-            String serial11 = "tc qdisc add dev " + networkName + " root netem delay 75ms loss 10%";      
-            String serial12 = "tc qdisc add dev " + networkName + " root netem delay 100ms loss 10%"; 
-            String serial13 = "tc qdisc add dev " + networkName + " root netem delay 125ms loss 10%"; 
-            String serial14 = "tc qdisc add dev " + networkName + " root netem delay 150ms loss 10%"; 
-            //latency with 20% packet loss
-            String serial15 = "tc qdisc add dev " + networkName + " root netem delay 10ms loss 20%"; 
-            String serial16 = "tc qdisc add dev " + networkName + " root netem delay 25ms loss 20%"; 
-            String serial17 = "tc qdisc add dev " + networkName + " root netem delay 50ms loss 20%";
-            String serial18 = "tc qdisc add dev " + networkName + " root netem delay 75ms loss 20%";      
-            String serial19 = "tc qdisc add dev " + networkName + " root netem delay 100ms loss 20%"; 
-            String serial20 = "tc qdisc add dev " + networkName + " root netem delay 125ms loss 20%"; 
-            String serial21 = "tc qdisc add dev " + networkName + " root netem delay 150ms loss 20%"; 
+            String profile0 = " tc qdisc add dev " + networkName + " root netem delay 0ms loss 0%"; 
+            String profile1 = " tc qdisc add dev " + networkName + " root netem delay 40ms loss 15%";
+            String profile2 = " tc qdisc add dev " + networkName + " root netem delay 80ms loss 30%"; 
+            String profile3 = " tc qdisc add dev " + networkName + " root netem delay 120ms loss 45%";
+            String profile4 = "tc qdisc add dev " + networkName + " root netem delay 160ms loss 60%";
+            String profile5 = "tc qdisc add dev " + networkName + " root netem delay 200ms loss 75%";
         switch (serialNum) {
-            case 1 -> serial = serial1;
-            case 2 -> serial = serial2;
-            case 3 -> serial = serial3;
-            case 4 -> serial = serial4;
-            case 5 -> serial = serial5;
-            case 6 -> serial = serial6;
-            case 7 -> serial = serial7;
-            case 8 -> serial = serial8;
-            case 9 -> serial = serial9;
-            case 10 -> serial = serial10;
-            case 11 -> serial = serial11;
-            case 12 -> serial = serial12;
-            case 13 -> serial = serial13;
-            case 14 -> serial = serial14;
-            case 15 -> serial = serial15;
-            case 16 -> serial = serial16;
-            case 17 -> serial = serial17;
-            case 18 -> serial = serial18;
-            case 19 -> serial = serial19;
-            case 20 -> serial = serial20;
-            case 21 -> serial = serial21;
+            case 0 -> serial = profile0;
+            case 1 -> serial = profile1;
+            case 2 -> serial = profile2;
+            case 3 -> serial = profile3;
+            case 4 -> serial = profile4;
+            case 5 -> serial = profile5;
             default -> System.out.println("Invalid serial number");
         }
         n0.giveSudoCommand(serial);
@@ -147,7 +114,7 @@ public class CognitiveAdvantageDegradationUI {
             }
             else if (ans.equals("3")) {
                 try {
-                    System.out.println("Choose your test case (1-21)");
+                    System.out.println("Choose your test case (0-6)");
                     int testNum = scan.nextInt();
                     fixDegradation("wwan0", testNum);
                     scan.nextLine();
@@ -160,7 +127,7 @@ public class CognitiveAdvantageDegradationUI {
             }
             else if (ans.equals("4")) {
                 try {
-                    System.out.println("Choose your test case (1-21)");
+                    System.out.println("Choose your test case (0-6)");
                     int testNum = scan.nextInt();
                     fixDegradation("enp10s0", testNum);
                     scan.nextLine();
