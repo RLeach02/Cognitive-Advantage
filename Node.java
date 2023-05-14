@@ -577,7 +577,7 @@ public class Node {
     * @param args
     */ 
     public static void main(String[] args) {
-        String ipAddr = ;
+        String ipAddr = "100.122.154.164";
         String user = ;
         String password = ;
         Node n1 = new Node(ipAddr, user, password);
