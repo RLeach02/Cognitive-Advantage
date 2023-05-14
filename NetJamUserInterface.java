@@ -2,16 +2,16 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 
 /**
- * Class: CognitiveAdvantageDegredationUI.java
+ * Class: NetJamUserInterface.java
  * Description: A class that provide a basic user interface for degradation network.
  * @author: Chitipat Marsri
  * @Javadoc Comments: Chitipat Marsri
  * @create: 01 May 2023
- * @LastUpdate: 11 May 2023
+ * @LastUpdate: 14 May 2023
  */
-public class CognitiveAdvantageDegradationUI {
+public class NetJamUserInterface {
     private Scanner scan =new Scanner(System.in);
-    private String ipAddr = ;
+    private String ipAddr = "100.122.154.164";
     private String user = ;
     private String password = ;
     private Node n0 = new Node(ipAddr, user, password);
@@ -23,14 +23,12 @@ public class CognitiveAdvantageDegradationUI {
      */
     public void fixDegradation(String networkName, int serialNum) {
         String serial = "";
-            String profile0 = " tc qdisc add dev " + networkName + " root netem delay 0ms loss 0%"; 
-            String profile1 = " tc qdisc add dev " + networkName + " root netem delay 40ms loss 15%";
-            String profile2 = " tc qdisc add dev " + networkName + " root netem delay 80ms loss 30%"; 
-            String profile3 = " tc qdisc add dev " + networkName + " root netem delay 120ms loss 45%";
-            String profile4 = "tc qdisc add dev " + networkName + " root netem delay 160ms loss 60%";
-            String profile5 = "tc qdisc add dev " + networkName + " root netem delay 200ms loss 75%";
+            String profile1 = " tc qdisc add dev " + networkName + " root netem delay 37.5ms loss 5%";
+            String profile2 = " tc qdisc add dev " + networkName + " root netem delay 75ms loss 10%"; 
+            String profile3 = " tc qdisc add dev " + networkName + " root netem delay 112.5ms loss 15%";
+            String profile4 = "tc qdisc add dev " + networkName + " root netem delay 150ms loss 20%";
+            String profile5 = "tc qdisc add dev " + networkName + " root netem delay 200ms loss 25%";
         switch (serialNum) {
-            case 0 -> serial = profile0;
             case 1 -> serial = profile1;
             case 2 -> serial = profile2;
             case 3 -> serial = profile3;
@@ -68,6 +66,9 @@ public class CognitiveAdvantageDegradationUI {
     * Description: Run all subsequent methods.
     */ 
     public void init() {
+        String wwanName = "wwan0";
+        String enp10s0Name = "enp10s0";
+        
         n0.getName_Metric_IP();
         n0.getConnectionName();
             while (true) {
@@ -114,9 +115,10 @@ public class CognitiveAdvantageDegradationUI {
             }
             else if (ans.equals("3")) {
                 try {
-                    System.out.println("Choose your test case (0-6)");
+                    System.out.println("Choose your test case (1-6)");
                     int testNum = scan.nextInt();
-                    fixDegradation("wwan0", testNum);
+                    restore(wwanName);
+                    fixDegradation(wwanName, testNum);
                     scan.nextLine();
                 } catch (InputMismatchException wrongType) {
                     System.out.println("Invalid input");
@@ -129,7 +131,8 @@ public class CognitiveAdvantageDegradationUI {
                 try {
                     System.out.println("Choose your test case (0-6)");
                     int testNum = scan.nextInt();
-                    fixDegradation("enp10s0", testNum);
+                    restore(enp10s0Name);
+                    fixDegradation(enp10s0Name, testNum);
                     scan.nextLine();
                 } catch (InputMismatchException wrongType) {
                     System.out.println("Invalid input");
@@ -140,15 +143,14 @@ public class CognitiveAdvantageDegradationUI {
             }
             else if (ans.equals("5")) {
                 try {
-                    restore("enp10s0");
+                    restore(enp10s0Name);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
             else if (ans.equals("6")) {
                 try {
-                    restore("wwx0a8a48a35927"); 
-                    restore("wwan0");
+                    restore(wwanName); 
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -215,7 +217,7 @@ public class CognitiveAdvantageDegradationUI {
     * Description: Runs the init() method for the existing node with all subsequent methods as per the method's comments.
     */ 
     public static void main(String args[]) {
-        CognitiveAdvantageDegradationUI dUI = new CognitiveAdvantageDegradationUI();
-        dUI.init();
+        NetJamUserInterface netJam = new NetJamUserInterface();
+        netJam.init();
     }
 }
