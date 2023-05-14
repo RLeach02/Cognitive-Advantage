@@ -2,14 +2,14 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 
 /**
- * Class: CognitiveAdvantageUserInterface.java
- * Description: A class that provide a basic user interface of node and network
+ * Class: NetJumperUserInterface.java
+ Description: A class that provide a basic user interface of node and network
  * @author: Chitipat Marsri
  * @Javadoc Comments: Gobi Jegarajasingham & Chitipat Marsri
  * @create: 30 Mar 2023
- * @LastUpdate: 11 May 2023
+ * @LastUpdate: 14 May 2023
  */
-public class CognitiveAdvantageUserInterface {
+public class NetJumperUserInterface {
     //scan to recieve input from user
     private Scanner scan =new Scanner(System.in);
     /** 
@@ -17,9 +17,14 @@ public class CognitiveAdvantageUserInterface {
     * Description: Run all subsequent methods.
     */ 
     public void init() {
-        String ipAddr = ;
+        //info to access
+        String ipAddr = "100.122.154.164";
         String user = ;
         String password = ;
+        //connection name
+        String wwanConName = "wwan0";
+        String enp10s0ConName = "enp10s0";
+        
         Node n0 = new Node(ipAddr, user, password);
         System.out.println("Welcome to Cognitive Advantage");
         n0.getName_Metric_IP();
@@ -55,28 +60,28 @@ public class CognitiveAdvantageUserInterface {
             }
             else if (ans.equals("2")) {
                 try {
-                    n0.turnOffNetwork("wwan0");
+                    n0.turnOffNetwork(wwanConName);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
             else if (ans.equals("3")) {
                 try {
-                    n0.turnOffNetwork("enp10s0");
+                    n0.turnOffNetwork(enp10s0ConName);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
             else if (ans.equals("4")) {
                 try {
-                    n0.turnOnNetwork("wwan0");
+                    n0.turnOnNetwork(wwanConName);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
             else if (ans.equals("5")) {
                 try {
-                    n0.turnOnNetwork("enp10s0");
+                    n0.turnOnNetwork(enp10s0ConName);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -85,9 +90,9 @@ public class CognitiveAdvantageUserInterface {
                 try{
                     System.out.println("Enter your new metric");
                     int ans1 = scan.nextInt();
-                    n0.changeMetric("wwan0", ans1);
-                    n0.turnOffNetwork("wwan0");
-                    n0.turnOnNetwork("wwan0");
+                    n0.changeMetric(wwanConName, ans1);
+                    n0.turnOffNetwork(wwanConName);
+                    n0.turnOnNetwork(wwanConName);
                     scan.nextLine();
                 } catch (InputMismatchException wrongType) {
                     System.out.println("Invalid input");
@@ -100,9 +105,9 @@ public class CognitiveAdvantageUserInterface {
                 try{
                     System.out.println("Enter your new metric");
                     int ans1 = scan.nextInt();
-                    n0.changeMetric("enp10s0", ans1);
-                    n0.turnOffNetwork("enp10s0");
-                    n0.turnOnNetwork("enp10s0");
+                    n0.changeMetric(enp10s0ConName, ans1);
+                    n0.turnOffNetwork(enp10s0ConName);
+                    n0.turnOnNetwork(enp10s0ConName);
                     scan.nextLine();
                 } catch (InputMismatchException wrongType) {
                     System.out.println("Invalid input");
@@ -201,7 +206,7 @@ public class CognitiveAdvantageUserInterface {
     * Description: Runs the init() method for the existing node with all subsequent methods as per the method's comments.
     */ 
     public static void main(String[] args) {
-        CognitiveAdvantageUserInterface ui = new CognitiveAdvantageUserInterface();
-        ui.init();
+        NetJumperUserInterface netJumper = new NetJumperUserInterface();
+        netJumper.init();
     }
 }
