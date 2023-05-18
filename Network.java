@@ -7,7 +7,7 @@ import java.util.Objects;
  * @author: Chitipat Marsri 
  * @Javadoc Comments:  Gobi Jegarjasingham & Chitipat Marsri
  * @create: 20 Mar 2023
- * @LastUpdate: 10 May 2023
+ * @LastUpdate: 18 May 2023
  */
 public class Network implements Comparable<Network> {
     //Attributes
@@ -27,6 +27,8 @@ public class Network implements Comparable<Network> {
     private double normalizedLatency;
     //Attribute normalizedPacketLoss: normalized packet loss
     private double normalizedPacketLoss;
+    //Attribute normalizedLatency: normalized latency
+    private double normalizedMeanDeviation;
     //Attribute weightedSum: wieghted sum
     private double weightedSum;   
     /**
@@ -108,6 +110,14 @@ public class Network implements Comparable<Network> {
         return normalizedPacketLoss;
     }
     /**
+     * Method: getNormalizedMeanDeviation
+     * Description: get normalized mean deviation
+     * @return normalized mean deviation
+     */
+    public double getNormalizedMeanDeviation() {
+        return normalizedMeanDeviation;
+    }
+    /**
      * Method: getWeightedSum()
      * Description: get weighted sum
      * @return weighted sum
@@ -178,6 +188,14 @@ public class Network implements Comparable<Network> {
      */
     public void setNormalizedPacketLoss(double normalizedPacketLoss) {
         this.normalizedPacketLoss = normalizedPacketLoss;
+    }
+    /**
+     * Method: setNormalizedMeanDeviation
+     * Description: set normalized mean deviation
+     * @param normalizedMeanDeviation normalized mean deviation
+     */
+    public void setNormalizedMeanDeviation(double normalizedMeanDeviation) {
+        this.normalizedMeanDeviation = normalizedMeanDeviation;
     }
     /**
      * Method: setWeightedSum()
