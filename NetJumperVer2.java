@@ -5,9 +5,9 @@ import java.util.Scanner;
  * Class: NetJumperVer2.java
  Description: A class that provide a basic user interface of node and network
  * @author: Chitipat Marsri
- * @Javadoc Comments: Chitipat Marsri
+ * @Javadoc Comments: Gobi Jegarajasingham & Chitipat Marsri
  * @create: 16 May 2023
- * @LastUpdate: 17 May 2023
+ * @LastUpdate: 18 May 2023
  */
 public class NetJumperVer2 {
     //scan to recieve input from user
@@ -38,7 +38,7 @@ public class NetJumperVer2 {
                                * 6: mod ping all                                            *
                                * 7: sort network bearers                                    *
                                * 8: iterate the selection program every 30 seconds          *
-                               * 9: fully automate the selection program                    *
+                               * 9: fully automate Net Jumper (until press Enter)           *
                                * 10: exit                                                   *
                                **************************************************************""");
             String ans = scan.nextLine();
@@ -134,12 +134,15 @@ public class NetJumperVer2 {
                     e.printStackTrace();
                 }       
             }
-            else if (ans.equals("9")) {
-                try{
-                    n0.fullyAutomation();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }       
+            else if (ans.equals("9")){
+                System.out.println("Press enter to stop, please wait a few seconds after pressing Enter for Net Jumper to finish last iteration");
+                InfiniteCounter infiniteCounter = new InfiniteCounter(n0);
+                Thread thread = new Thread(infiniteCounter);
+                thread.start();
+                Scanner scanner = new Scanner(System.in);
+                while (!scanner.hasNextLine());
+                infiniteCounter.booleanRun = false;
+                thread.interrupt();
             }
             else if (ans.equals("10")){
                 try {
