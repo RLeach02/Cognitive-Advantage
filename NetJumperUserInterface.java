@@ -7,7 +7,7 @@ import java.util.Scanner;
  * @author: Chitipat Marsri
  * @Javadoc Comments: Gobi Jegarajasingham & Chitipat Marsri
  * @create: 30 Mar 2023
- * @LastUpdate: 14 May 2023
+ * @LastUpdate: 18 May 2023
  */
 public class NetJumperUserInterface {
     //scan to recieve input from user
@@ -18,7 +18,7 @@ public class NetJumperUserInterface {
     */ 
     public void init() {
         //info to access
-        String ipAddr = "100.122.154.164";
+        String ipAddr = ;
         String user = ;
         String password = ;
         //connection name
@@ -182,11 +182,14 @@ public class NetJumperUserInterface {
                 }       
             }
             else if (ans.equals("14")) {
-                try{
-                    n0.fullyAutomation();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }       
+                System.out.println("Press enter to stop, please wait a few seconds after pressing Enter for Net Jumper to finish last iteration");
+                InfiniteCounter infiniteCounter = new InfiniteCounter(n0);
+                Thread thread = new Thread(infiniteCounter);
+                thread.start();
+                Scanner scanner = new Scanner(System.in);
+                while (!scanner.hasNextLine());
+                infiniteCounter.booleanRun = false;
+                thread.interrupt();     
             }
             else if (ans.equals("15")){
                 try {
