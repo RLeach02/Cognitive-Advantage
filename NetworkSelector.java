@@ -8,12 +8,13 @@ import java.util.List;
  * @author: Chitipat Marsri
  * @Javadoc Comments: Chitipat Marsri
  * @create: 09 May 2023
- * @LastUpdate: 10 May 2023
+ * @LastUpdate: 18 May 2023
  */
 public class NetworkSelector {
     // Define weights for each attribute (latency and packet loss)
-    private static final double WEIGHT_LATENCY = 0.3;
-    private static final double WEIGHT_PACKET_LOSS = 1 - WEIGHT_LATENCY;
+    private static final double WEIGHT_LATENCY = 0.5;
+    private static final double WEIGHT_PACKET_LOSS = 0.3;
+    private static final double MEAN_DEVIATION_WEIGHT = 0.2;
     /**
      * Method: selectBestNetwork
      * Description: Select best network using weighted sum method
@@ -28,7 +29,7 @@ public class NetworkSelector {
 
         // Calculate the weighted sum of each network
         for (Network network : networks) {
-            double weightedSum = WEIGHT_LATENCY * network.getNormalizedLatency() + WEIGHT_PACKET_LOSS * network.getNormalizedPacketLoss();
+            double weightedSum = WEIGHT_LATENCY * network.getNormalizedLatency() + WEIGHT_PACKET_LOSS * network.getNormalizedPacketLoss() + MEAN_DEVIATION_WEIGHT * network.getNormalizedMeanDeviation();
             network.setWeightedSum(weightedSum);
         }
 
@@ -58,9 +59,13 @@ public class NetworkSelector {
         double maxLatency = Double.MIN_VALUE;
         double minPacketLoss = Double.MAX_VALUE;
         double maxPacketLoss = Double.MIN_VALUE;
+        double minMeanDeviation = Double.MAX_VALUE;
+        double maxMeanDeviation = Double.MIN_VALUE;
+        
         for (Network network : networks) {
             double latency = network.getLatency().get(1);
             double packetLoss = network.getPacketLoss();
+            double meanDeviation = network.getLatency().get(3);
             if (latency < minLatency) {
                 minLatency = latency;
             }
@@ -73,16 +78,26 @@ public class NetworkSelector {
             if (packetLoss > maxPacketLoss) {
                 maxPacketLoss = packetLoss;
             }
+            if (meanDeviation < minMeanDeviation) {
+                minMeanDeviation = meanDeviation;
+            }
+            if (meanDeviation > maxMeanDeviation) {
+                maxMeanDeviation = meanDeviation;
+            }
         }
 
         // Normalize the values of each attribute to the range [0, 1]
         for (Network network : networks) {
             double latency = network.getLatency().get(1);
             double packetLoss = network.getPacketLoss();
+            double meanDeviation = network.getLatency().get(3);
+
             double normalizedLatency = (latency - minLatency) / (maxLatency - minLatency);
             double normalizedPacketLoss = (packetLoss - minPacketLoss) / (maxPacketLoss - minPacketLoss);
+            double normalizedMeanDeviation = (meanDeviation - minMeanDeviation) / (maxMeanDeviation - minMeanDeviation);
             network.setNormalizedLatency(normalizedLatency);
             network.setNormalizedPacketLoss(normalizedPacketLoss);
+            network.setNormalizedMeanDeviation(normalizedMeanDeviation);
         }
     }
     /**
@@ -94,15 +109,26 @@ public class NetworkSelector {
      */
     private boolean shouldSwitch(Network currentNet, Network bestNet) {
         final double DIFF_THRESHOLD = 20; //acceptable different between latency
-        double latencyDiff = Math.abs(currentNet.getLatency().get(1) - bestNet.getLatency().get(1));
-        double packetLossDiff = bestNet.getPacketLoss() - currentNet.getPacketLoss();
-        if (latencyDiff < DIFF_THRESHOLD) { // modify the threshold as needed
-            if (packetLossDiff < 0) {
+        double latencyDiff = currentNet.getLatency().get(1) - bestNet.getLatency().get(1);
+        
+        boolean acceptableLatency = latencyDiff < DIFF_THRESHOLD;
+        boolean betterPacketLoss = bestNet.getPacketLoss() < currentNet.getPacketLoss();
+        boolean betterMeanDeviation = bestNet.getLatency().get(3) < currentNet.getLatency().get(3);
+                
+        if (acceptableLatency) { // modify the threshold as needed
+            if (betterPacketLoss) {
                 return true;
+            } else {
+                if (betterMeanDeviation) {
+                    return true;
+                } else {
+                    return false;
+                }
             }
-            return false;
         }
-        return true;
+        else {
+            return true;
+        }
     }
     /** 
     * Method: main 
@@ -122,26 +148,26 @@ public class NetworkSelector {
         networks.add(n4);
         networks.add(n5);
         //test setLatency() and sort algorithm
-        ArrayList<Double> latencyList1 = new ArrayList<>(List.of(0.0, 80.0, 0.0, 0.0));
-        ArrayList<Double> latencyList2 = new ArrayList<>(List.of(0.0, 50.0, 0.0, 0.0));
-        ArrayList<Double> latencyList3 = new ArrayList<>(List.of(0.0, 70.0, 0.0, 0.0));
-        ArrayList<Double> latencyList4 = new ArrayList<>(List.of(0.0, 50.0, 0.0, 0.0));
-        ArrayList<Double> latencyList5 = new ArrayList<>(List.of(0.0, 75.0, 0.0, 0.0));
+        ArrayList<Double> latencyList1 = new ArrayList<>(List.of(0.0, 20.0, 0.0, 20.0));
+        ArrayList<Double> latencyList2 = new ArrayList<>(List.of(0.0, 50.0, 0.0, 9.0));
+        ArrayList<Double> latencyList3 = new ArrayList<>(List.of(0.0, 30.0, 0.0, 13.0));
+        ArrayList<Double> latencyList4 = new ArrayList<>(List.of(0.0, 100.0, 0.0, 2.0));
+        ArrayList<Double> latencyList5 = new ArrayList<>(List.of(0.0, 100.0, 0.0, 5.0));
         n1.setLatency(latencyList1);
         n2.setLatency(latencyList2);
         n3.setLatency(latencyList3);
         n4.setLatency(latencyList4);
         n5.setLatency(latencyList5);
-        n1.setPacketLoss(6.0);
-        n2.setPacketLoss(6.0);
-        n3.setPacketLoss(7.0);
+        n1.setPacketLoss(3.0);
+        n2.setPacketLoss(0.0);
+        n3.setPacketLoss(3.0);
         n4.setPacketLoss(15.0);
-        n5.setPacketLoss(6.0);
+        n5.setPacketLoss(10.0);
         
         NetworkSelector test = new NetworkSelector();
         ArrayList<Network> sortedNetworkList = test.selectBestNetwork(networks, n5);
         for (Network network : sortedNetworkList) {
-            System.out.println(network + "\tavg latency: " + network.getLatency().get(1) + "\tpacket loss: " + network.getPacketLoss());
+            System.out.println(network + "\tavg latency: " + network.getLatency().get(1) + "\tpacket loss: " + network.getPacketLoss()+ "\tmean deviation: " + network.getLatency().get(3));
         }
     }
 }
