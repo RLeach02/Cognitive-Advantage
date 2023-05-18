@@ -7,7 +7,7 @@ import java.io.*;
  * @author: Chitipat Marsri
  * @Javadoc Comments: Gobi Jegarajasingham & Chitipat Marsri
  * @create: 20 Mar 2023
- * @LastUpdate: 11 May 2023
+ * @LastUpdate: 18 May 2023
  */
 public class Node {
     //Attributes
@@ -274,16 +274,32 @@ public class Node {
             channel.connect();
             out.write((password + "\n").getBytes());
             out.flush();
-            timer(1);
+            try {
+                timer(1);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             out.write((cmd2 + "\n").getBytes());
             out.flush();
-            timer(1);
+            try {
+                timer(1);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             out.write((cmd3 + "\n").getBytes());
             out.flush();
-            timer(1);
+            try {
+                timer(1);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             out.write((cmd4 + "\n").getBytes());
             out.flush();
-            timer(1);
+            try {
+                timer(1);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             byte[] tmp = new byte[1024];
             while (true) {
                 while (in.available() > 0) {
@@ -342,7 +358,6 @@ public class Node {
         String targetIP = "1.1.1.1"; // Cloudflare
         String packetLoss = new String();
         String[] latency = new String[4];
-        //String pingCmd = "ping -I " + net.getName() + " -c " + pingTime + " " + targetIP;
         String pingCmd = "ping -I " + net.getName() + " -c " + pingTime + " -i "+ pingInterval + " " + targetIP;
         ArrayList<String> in = new ArrayList<>();
         
@@ -445,13 +460,10 @@ public class Node {
     * Method: timer 
     * Description: Sets a timer between each command1
     * @param second 
+    * @throws java.lang.InterruptedException 
     */
-    public void timer(int second) {
-        try {
-            Thread.sleep(second*1000); // 1000 milliseconds = 1 second
-        } catch (InterruptedException e) {
-            e.getMessage();// handle the exception if needed
-        }
+    public void timer(int second) throws InterruptedException{
+        Thread.sleep(second*1000);
     }
     /**
     * Method: monitor 
@@ -491,14 +503,18 @@ public class Node {
                 turnOnNetwork(networkList.get(i).getConnectionName());
             }
             System.out.println("Using " + networkList.get(0));
-            timer(time);
+            try {
+                timer(time);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
     /**
     * Method: fullyAutomation
     * Description: Automatically change network until the user terminate the program.
     */
-    public void fullyAutomation() {
+    public void fullyAutomation() throws InterruptedException{
         // reset the metric if hit 1000
         int metricReset = 50;
         int maxMetric = 1000;
@@ -516,23 +532,20 @@ public class Node {
                 turnOnNetwork(networkList.get(i).getConnectionName());
             }
         }
-        //iteration
-        while (true) {
-            //ping network
-            System.out.println("\nStart pinging");
-            pingAll(pingTime, pingInterval);
-            //sort network
-            networkSelection();
-            //change metric
-            for (int i = 1; i < networkList.size(); i++) {
-                int newMetric =networkList.get(0).getMetric()+i;
-                changeMetric(networkList.get(i).getConnectionName(), newMetric);
-                turnOffNetwork(networkList.get(i).getConnectionName());
-                turnOnNetwork(networkList.get(i).getConnectionName());
-            }
-            System.out.println("Using " + networkList.get(0));
-            timer(time);
+        //ping network
+        System.out.println("\nStart pinging");
+        pingAll(pingTime, pingInterval);
+        //sort network
+        networkSelection();
+        //change metric
+        for (int i = 1; i < networkList.size(); i++) {
+            int newMetric =networkList.get(0).getMetric()+i;
+            changeMetric(networkList.get(i).getConnectionName(), newMetric);
+            turnOffNetwork(networkList.get(i).getConnectionName());
+            turnOnNetwork(networkList.get(i).getConnectionName());
         }
+        System.out.println("Using " + networkList.get(0));
+        timer(time);
     }
     /**
     * Method: disconnectSSHConnection
@@ -577,7 +590,7 @@ public class Node {
     * @param args
     */ 
     public static void main(String[] args) {
-        String ipAddr = "100.122.154.164";
+        String ipAddr = ;
         String user = ;
         String password = ;
         Node n1 = new Node(ipAddr, user, password);
