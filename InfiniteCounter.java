@@ -34,11 +34,15 @@ public class InfiniteCounter implements Runnable{
                 node.fullyAutomation();
             } catch(InterruptedException e) {
                 e.printStackTrace();
+            } finally {
+                System.out.println("Net Jumper stop");
+                node.disconnectSSHConnection();
+                break;
             }
         }
-        System.out.println("Net Jumper stop");
     }
     public static void main(String args[]) {
+        /*
         InfiniteCounter infiniteCounter = new InfiniteCounter(node);
         Thread thread = new Thread(infiniteCounter);
         thread.start();
@@ -46,5 +50,6 @@ public class InfiniteCounter implements Runnable{
         while (!scanner.hasNextLine());
         infiniteCounter.booleanRun = false;
         thread.interrupt();
+        */
     }
 }
