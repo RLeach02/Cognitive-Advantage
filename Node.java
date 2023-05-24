@@ -12,7 +12,7 @@ import java.io.*;
 public class Node implements Runnable{
     //Attributes
     //Attribute Network Size : Number of Networks 
-    private int networkSize; 
+    private int networkSize;
     //Attribute networkList: Array of available connected networks 
     private ArrayList<Network> networkList = new ArrayList<>();
     //Attribute jsch: Java implementation of SSH 2 that enables connection to an SSH server 
@@ -21,12 +21,23 @@ public class Node implements Runnable{
     private Session session;
     //Attribute: password 
     private String password;
+    //global variable
+    public String targetIP; //cloud flare
+    public int metricReset; //reset metric
+    public int maxMetric; //max metric
+    public int pingTime; //number of times of ping
+    public int time; //waiting time
+    public double pingInterval; //interval between ping
+    public double weightLatency; //weight latency 
+    public double weightPacketLoss; //weight packet loss 
+    public double weightMeanDeviation; //weight mean deviation 
+    public double diffThreshold; //acceptable threshold
     /**
-    * Method: Constructor of Node.java class that establish connection with PuTTY
+    * Method: Constructor 
     * Description: Connects the java program to the Linux Ubuntu testbed server 
-    * @param host
-    * @param username
-    * @param password 
+    * @param host host IP address
+    * @param username username
+    * @param password password
     */
     public Node(String host, String username, String password) {
         this.password = password;
@@ -43,11 +54,36 @@ public class Node implements Runnable{
             // Connect to the remote server
             session.connect();
         } catch (JSchException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
     }
     /**
-     * Method: This method will parse required commands through PuTTY
+     * Method: extractFile
+     * Description: extract data from config.properties
+     */
+    public void extractFile() {
+        //read file
+        Properties properties = new Properties();
+        try (BufferedReader reader = new BufferedReader(new FileReader("config.properties"))) {
+            properties.load(reader);
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            return;
+        }
+        //extract data
+        targetIP = properties.getProperty("cloud_flare");
+        metricReset = Integer.parseInt(properties.getProperty("metric_reset"));
+        maxMetric = Integer.parseInt(properties.getProperty("max_metric"));
+        pingTime = Integer.parseInt(properties.getProperty("ping_time"));
+        time = Integer.parseInt(properties.getProperty("waiting_time"));
+        pingInterval = Double.parseDouble(properties.getProperty("ping_interval"));
+        weightLatency = Double.parseDouble(properties.getProperty("weight_latency"));
+        weightPacketLoss = Double.parseDouble(properties.getProperty("weight_packet_loss"));
+        weightMeanDeviation = Double.parseDouble(properties.getProperty("mean_deviation_weight"));
+        diffThreshold = Double.parseDouble(properties.getProperty("diff_threshold"));
+    }
+    /**
+     * Method: giveCommand
      * Description: Gives the testbed commands to extract the network names, set metrics, packet loss and latency 
      * @param command string of command1 
      * @return ArrayList<String> of the result from Putty
@@ -72,14 +108,14 @@ public class Node implements Runnable{
             }
             channel.disconnect();
         } catch (JSchException | IOException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
         return out;
     }
     /**
-     * Method: This method will give sudo command1 to the testbed through PuTTY 
+     * Method: giveSudoCommand
+     * Description: This method will give sudo command1 to the testbed through PuTTY 
      * @param command string of command1 
-     * @param sudoPassword password for sudo command1
      * @return ArrayList<String> of the result from Putty
      */
     public ArrayList<String> giveSudoCommand(String command) {
@@ -104,7 +140,7 @@ public class Node implements Runnable{
             }
             channel.disconnect();
         } catch (JSchException | IOException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
         return output;
     }
@@ -195,9 +231,8 @@ public class Node implements Runnable{
      */
     public void updateIpAddress() {
         String command = "ip -o -4 addr show | awk '{print $2, $4}' && ip route show | awk '{print $1, $2, $5}'";
-        ArrayList<String> in = new ArrayList<>();        
         //geting ip address
-        in = giveCommand(command);   
+        ArrayList<String> in = giveCommand(command);           
         //loop for extracting data
         for (int i = 0;i < networkList.size(); i++) {
             String[] data = in.get(i+1).split(" ");
@@ -216,11 +251,10 @@ public class Node implements Runnable{
      */
     public void updateMetric() {
         String command1 = "ip route | grep default";
-        ArrayList<String> in = new ArrayList<>();
-        ArrayList<String> name = new ArrayList<>();
-        ArrayList<Integer> metric = new ArrayList<>();
         //getting metric
-        in = giveCommand(command1);   
+        ArrayList<String> in = giveCommand(command1);
+        ArrayList<String> name = new ArrayList<>();
+        ArrayList<Integer> metric = new ArrayList<>(); 
         //loop for extracting data
         for (int i = 0;i < networkList.size(); i++) {
             String[] data = in.get(i).split(" ");
@@ -277,28 +311,28 @@ public class Node implements Runnable{
             try {
                 timer(1);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                System.out.println(e.getMessage());
             }
             out.write((cmd2 + "\n").getBytes());
             out.flush();
             try {
                 timer(1);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                System.out.println(e.getMessage());
             }
             out.write((cmd3 + "\n").getBytes());
             out.flush();
             try {
                 timer(1);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                System.out.println(e.getMessage());
             }
             out.write((cmd4 + "\n").getBytes());
             out.flush();
             try {
                 timer(1);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                System.out.println(e.getMessage());
             }
             byte[] tmp = new byte[1024];
             while (true) {
@@ -320,7 +354,7 @@ public class Node implements Runnable{
                 }
             }
         } catch (JSchException | IOException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
     }
     /**
@@ -344,7 +378,6 @@ public class Node implements Runnable{
         String command = "nmcli con up '" + connectionName + "'";
         in = giveSudoCommand(command);
         System.out.println("Turn on " + connectionName + " successfully");
-        updateNetworkInfo();
         System.out.println("Update networks' information successfully");
     }
     /**
@@ -355,13 +388,11 @@ public class Node implements Runnable{
     * @param pingInterval interval between each ping
     */
     public void pingNetwork(Network net, int pingTime, double pingInterval) {
-        String targetIP = "1.1.1.1"; // Cloudflare
+        targetIP = "1.1.1.1"; // Cloudflare
         String packetLoss = new String();
         String[] latency = new String[4];
         String pingCmd = "ping -I " + net.getName() + " -c " + pingTime + " -i "+ pingInterval + " " + targetIP;
-        ArrayList<String> in = new ArrayList<>();
-        
-        in = giveCommand(pingCmd);
+        ArrayList<String> in = giveCommand(pingCmd);
         String ping = in.get(in.size()-2).concat(" ").concat(in.get(in.size()-1));
         //loop for extracting the data
         String[] data = ping.split(" ");
@@ -410,7 +441,7 @@ public class Node implements Runnable{
             try {
                 thread.join();
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                System.out.println(e.getMessage());
             }
         }
     }
@@ -451,10 +482,12 @@ public class Node implements Runnable{
         updateNetworkInfo();
         System.out.println("Update networks' information successfully");
         Network current = networkList.get(0);
-        NetworkSelector agent = new NetworkSelector();
+        NetworkSelector agent = new NetworkSelector(weightLatency, weightPacketLoss, weightMeanDeviation, diffThreshold);
         this.networkList = agent.selectBestNetwork(networkList, current); 
         System.out.println("\n");
-        System.out.println("Best bearer is " + networkList.get(0).getName() + "\tavg latency: " + networkList.get(0).getLatency().get(1) + " ms\tpacket loss: " + networkList.get(0).getPacketLoss() + " %\tmetric: " + networkList.get(0).getMetric());        
+        for (int i = 0; i < networkList.size(); i++) {
+            System.out.println(i+1 + " bearer is " + networkList.get(i).getName() + "\tavg latency: " + networkList.get(i).getLatency().get(1) + " ms\tmean deviation: " + networkList.get(i).getLatency().get(3) + "ms\tpacket loss: " + networkList.get(i).getPacketLoss() + " %\tmetric: " + networkList.get(i).getMetric());        
+        }
     }
     /**
     * Method: timer 
@@ -471,12 +504,6 @@ public class Node implements Runnable{
     * @param times 
     */
     public void monitor(int times) {
-        // reset the metric if hit 1000
-        int metricReset = 50;
-        int maxMetric = 1000;
-        int pingTime = 1000;
-        double pingInterval = 10.0/pingTime;
-        int time = 5;
         //reset metric if metric become large
         if (networkList.get(0).getMetric() > maxMetric) {
             changeMetric(networkList.get(0).getName(), metricReset);
@@ -487,6 +514,7 @@ public class Node implements Runnable{
                 turnOffNetwork(networkList.get(i).getConnectionName());
                 turnOnNetwork(networkList.get(i).getConnectionName());
             }
+            updateNetworkInfo();
         }
         //iteration
         for (int n = 0; n < times; n++) {
@@ -502,25 +530,21 @@ public class Node implements Runnable{
                 turnOffNetwork(networkList.get(i).getConnectionName());
                 turnOnNetwork(networkList.get(i).getConnectionName());
             }
+            updateNetworkInfo();
             System.out.println("Using " + networkList.get(0));
             try {
                 timer(time);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                System.out.println(e.getMessage());
             }
         }
     }
     /**
     * Method: fullyAutomation
     * Description: Automatically change network until the user terminate the program.
+     * @throws java.lang.InterruptedException
     */
     public void fullyAutomation() throws InterruptedException{
-        // reset the metric if hit 1000
-        int metricReset = 50;
-        int maxMetric = 1000;
-        int pingTime = 1000;
-        double pingInterval = 10.0/pingTime;
-        int time = 5;
         //reset metric if metric become large
         if (networkList.get(0).getMetric() > maxMetric) {
             changeMetric(networkList.get(0).getName(), metricReset);
@@ -531,6 +555,7 @@ public class Node implements Runnable{
                 turnOffNetwork(networkList.get(i).getConnectionName());
                 turnOnNetwork(networkList.get(i).getConnectionName());
             }
+            updateNetworkInfo();
         }
         //ping network
         System.out.println("\nStart pinging");
@@ -544,17 +569,17 @@ public class Node implements Runnable{
             turnOffNetwork(networkList.get(i).getConnectionName());
             turnOnNetwork(networkList.get(i).getConnectionName());
         }
+        updateNetworkInfo();
         System.out.println("Using " + networkList.get(0));
         timer(time);
     }
     /**
     * Method: disconnectSSHConnection
-    * Description: Disconnects the Putty 
+    * Description: Disconnects the Putty .
     */ 
     public void disconnectSSHConnection() {
         try {
             session.disconnect();
-            System.out.println("Disconnect successfully");
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -564,6 +589,7 @@ public class Node implements Runnable{
     * Description: Run all subsequent methods
     */ 
     public void init() {
+        extractFile();
         getName_Metric_IP();
         printNetworkList();
         getConnectionName();
@@ -574,10 +600,19 @@ public class Node implements Runnable{
      */
     @Override
     public void run() {
-        String ipAddr = ;
-        String user = ;
-        String password = ;
+        Properties properties = new Properties();
+        try (BufferedReader reader = new BufferedReader(new FileReader("config.properties"))) {
+            properties.load(reader);
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            return;
+        }
+        //extract data
+        String ipAddr = properties.getProperty("ip_addr");
+        String user = properties.getProperty("username");
+        password = properties.getProperty("password");
         Node node = new Node(ipAddr, user, password);
+        node.extractFile();
         node.getName_Metric_IP();
         node.getConnectionName();
         //fully automate
@@ -588,6 +623,7 @@ public class Node implements Runnable{
         while (!scanner.hasNextLine());
         infiniteCounter.booleanRun = false;
         thread.interrupt();       
+        System.out.println("Please wait a few seconds for Net Jumper to finish last iteration");
     }
     /** 
     * Method: main 
@@ -596,13 +632,22 @@ public class Node implements Runnable{
     */ 
     public static void main(String[] args) {
         /*
-        String ipAddr = ;
-        String user = ;
-        String password = ;
+        Properties properties = new Properties();
+        try (BufferedReader reader = new BufferedReader(new FileReader("config.properties"))) {
+            properties.load(reader);
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            return;
+        }
+        //extract data
+        String ipAddr = properties.getProperty("ip_addr");
+        String user = properties.getProperty("username");
+        String password = properties.getProperty("password");
         Node n1 = new Node(ipAddr, user, password);
-        
         n1.init();
-        
+        n1.disconnectSSHConnection();
+        System.out.println("Disconnect successfully");
+        /*
         //fully automate
         InfiniteCounter infiniteCounter = new InfiniteCounter(n1);
         Thread thread = new Thread(infiniteCounter);
