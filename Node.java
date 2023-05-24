@@ -568,11 +568,6 @@ public class Node implements Runnable{
         printNetworkList();
         getConnectionName();
     }
-    /** 
-    * Method: main 
-    * Description: Runs the init() method for the existing node with all subsequent methods as per the method's comments
-    * @param args
-    */ 
     /**
      * Method: run
      * Description: Start Net Jumper until iteration is interrupted.
@@ -592,8 +587,13 @@ public class Node implements Runnable{
         Scanner scanner = new Scanner(System.in);
         while (!scanner.hasNextLine());
         infiniteCounter.booleanRun = false;
-        thread.interrupt();
+        thread.interrupt();       
     }
+    /** 
+    * Method: main 
+    * Description: Runs the init() method for the existing node with all subsequent methods as per the method's comments
+    * @param args
+    */ 
     public static void main(String[] args) {
         /*
         String ipAddr = ;
@@ -602,7 +602,7 @@ public class Node implements Runnable{
         Node n1 = new Node(ipAddr, user, password);
         
         n1.init();
-        /*
+        
         //fully automate
         InfiniteCounter infiniteCounter = new InfiniteCounter(n1);
         Thread thread = new Thread(infiniteCounter);
