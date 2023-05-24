@@ -5,7 +5,7 @@ import java.util.Scanner;
  * @author: Chitipat Marsri
  * @Javadoc Comments: Chitipat Marsri
  * @create: 18 May 2023
- * @LastUpdate: 18 May 2023
+ * @LastUpdate: 24 May 2023
  */
 public class InfiniteCounter implements Runnable{
     //variable to stop automation when false
@@ -33,14 +33,23 @@ public class InfiniteCounter implements Runnable{
                 System.out.println("Iteration: " + i++);
                 node.fullyAutomation();
             } catch(InterruptedException e) {
-                e.printStackTrace();
-            } finally {
-                System.out.println("Net Jumper stop");
-                node.disconnectSSHConnection();
-                break;
-            }
+                System.out.println(e.getMessage());
+            } 
+        }
+        try {
+            System.out.println("Net Jumper stop");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        } finally {
+            node.disconnectSSHConnection();
+            System.out.println("Disconnect successfully");    
+            System.out.println("Good bye");
         }
     }
+    /** 
+    * Method: main 
+    * @param args
+    */ 
     public static void main(String args[]) {
         /*
         InfiniteCounter infiniteCounter = new InfiniteCounter(node);
