@@ -1,4 +1,8 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.InputMismatchException;
+import java.util.Properties;
 import java.util.Scanner;
 
 /**
@@ -11,11 +15,29 @@ import java.util.Scanner;
  */
 public class NetJamVer2 {
     private Scanner scan =new Scanner(System.in);
-    private String ipAddr = ;
-    private String user = ;
-    private String password = ;
-    private Node n0 = new Node(ipAddr, user, password);
-    
+    private String ipAddr;
+    private String user;
+    private String password;
+    private Node n0;
+    /**
+    * Method: Constructor 
+    * Description: Get information from config.properties to create Node object.
+    */
+    public NetJamVer2() {
+        //read file
+        Properties properties = new Properties();
+        try (BufferedReader reader = new BufferedReader(new FileReader("config.properties"))) {
+            properties.load(reader);
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            return;
+        }
+        //extract data
+        ipAddr = properties.getProperty("ip_addr");
+        user = properties.getProperty("username");
+        password = properties.getProperty("password");
+        n0 = new Node(ipAddr, user, password);
+    }
     /**
      * Method: fixDegradation
      * Description: provide a test case for quick degradation
@@ -89,7 +111,7 @@ public class NetJamVer2 {
                     System.out.println("There are " + n0.getNetworkListSize() + " network bearers");
                     n0.printNetworkList();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    System.out.println(e.getMessage());
                 }
             }
             else if (ans.equals("2")) {
@@ -106,7 +128,7 @@ public class NetJamVer2 {
                     System.out.println("Invalid input");
                     scan.nextLine();
                 }catch (Exception e) {
-                    e.printStackTrace();
+                    System.out.println(e.getMessage());
                 }
             }
             else if (ans.equals("3")) {
@@ -122,7 +144,7 @@ public class NetJamVer2 {
                     System.out.println("Invalid input");
                     scan.nextLine();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    System.out.println(e.getMessage());
                 }
             }
             else if (ans.equals("4")) {
@@ -131,7 +153,7 @@ public class NetJamVer2 {
                     String netName = scan.nextLine();
                     restore(netName);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    System.out.println(e.getMessage());
                 }
             }
             else if (ans.equals("5")) {
@@ -140,14 +162,14 @@ public class NetJamVer2 {
                         restore(n0.getNetworkList().get(i).getName()); 
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    System.out.println(e.getMessage());
                 }
             }
             else if (ans.equals("6")) {     
                 try{
                     n0.pingAll(100, 0.01);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    System.out.println(e.getMessage());
                 }
             }
             else if (ans.equals("7")) {     
@@ -162,7 +184,7 @@ public class NetJamVer2 {
                     System.out.println("Invalid input");
                     scan.nextLine();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    System.out.println(e.getMessage());
                 }
             }
             else if (ans.equals("8")) {
@@ -170,7 +192,9 @@ public class NetJamVer2 {
                     n0.disconnectSSHConnection();
                     break;
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    System.out.println(e.getMessage());
+                } finally {
+                    System.out.println("Disconnect successfully");
                 }
             }
             else {
@@ -181,6 +205,7 @@ public class NetJamVer2 {
     /** 
     * Method: main 
     * Description: Runs the init() method for the existing node with all subsequent methods as per the method's comments.
+    * @param args
     */ 
     public static void main(String args[]) {
         NetJamVer2 netJam = new NetJamVer2();
