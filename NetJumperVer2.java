@@ -1,4 +1,8 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.InputMismatchException;
+import java.util.Properties;
 import java.util.Scanner;
 
 /**
@@ -7,7 +11,7 @@ import java.util.Scanner;
  * @author: Chitipat Marsri
  * @Javadoc Comments: Gobi Jegarajasingham & Chitipat Marsri
  * @create: 16 May 2023
- * @LastUpdate: 18 May 2023
+ * @LastUpdate: 25 May 2023
  */
 public class NetJumperVer2 {
     //scan to recieve input from user
@@ -17,13 +21,22 @@ public class NetJumperVer2 {
     * Description: Run all subsequent methods.
     */ 
     public void init() {
-        //info to access
-        String ipAddr = ;
-        String user = ;
-        String password = ;
+        //read file
+        Properties properties = new Properties();
+        try (BufferedReader reader = new BufferedReader(new FileReader("config.properties"))) {
+            properties.load(reader);
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            return;
+        }
+        //extract data
+        String ipAddr = properties.getProperty("ip_addr");
+        String user = properties.getProperty("username");
+        String password = properties.getProperty("password");
         Node n0 = new Node(ipAddr, user, password);
         
         System.out.println("Welcome to Cognitive Advantage");
+        n0.extractFile();
         n0.getName_Metric_IP();
         n0.getConnectionName();
         while (true) {
@@ -47,7 +60,7 @@ public class NetJumperVer2 {
                     System.out.println("There are " + n0.getNetworkListSize() + " network bearers");
                     n0.printNetworkList();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    System.out.println(e.getMessage());
                 }
             }
             else if (ans.equals("2")) {
@@ -59,7 +72,7 @@ public class NetJumperVer2 {
                     System.out.println("Invalid input");
                     scan.nextLine();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    System.out.println(e.getMessage());
                 }
             }
             else if (ans.equals("3")) {
@@ -67,11 +80,12 @@ public class NetJumperVer2 {
                     System.out.println("Enter connection name");
                     String conName = scan.nextLine();
                     n0.turnOnNetwork(conName);
+                    n0.updateNetworkInfo();
                 }catch (InputMismatchException wrongType) {
                     System.out.println("Invalid input");
                     scan.nextLine();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    System.out.println(e.getMessage());
                 }
             }
             else if (ans.equals("4")) {
@@ -83,19 +97,20 @@ public class NetJumperVer2 {
                     n0.changeMetric(conName, ans1);
                     n0.turnOffNetwork(conName);
                     n0.turnOnNetwork(conName);
+                    n0.updateNetworkInfo();
                     scan.nextLine();
                 } catch (InputMismatchException wrongType) {
                     System.out.println("Invalid input");
                     scan.nextLine();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    System.out.println(e.getMessage());
                 }
             }
             else if (ans.equals("5")) {     
                 try{
                     n0.pingAll(100, 0.01);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    System.out.println(e.getMessage());
                 }
             }
             else if (ans.equals("6")) {     
@@ -110,7 +125,7 @@ public class NetJumperVer2 {
                     System.out.println("Invalid input");
                     scan.nextLine();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    System.out.println(e.getMessage());
                 }
             }
             else if (ans.equals("7")){
@@ -118,7 +133,7 @@ public class NetJumperVer2 {
                     n0.pingAll(100, 0.01);
                     n0.networkSelection();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    System.out.println(e.getMessage());
                 }
             }
             else if (ans.equals("8")) {
@@ -131,7 +146,7 @@ public class NetJumperVer2 {
                     System.out.println("Invalid input");
                     scan.nextLine();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    System.out.println(e.getMessage());
                 }       
             }
             else if (ans.equals("9")){
@@ -143,13 +158,17 @@ public class NetJumperVer2 {
                 while (!scanner.hasNextLine());
                 infiniteCounter.booleanRun = false;
                 thread.interrupt();
+                System.out.println("Please wait a few seconds for Net Jumper to finish last iteration");
+                break;
             }
             else if (ans.equals("10")){
                 try {
                     n0.disconnectSSHConnection();
                     break;
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    System.out.println(e.getMessage());
+                } finally {
+                    System.out.println("Disconnect successfully");
                 }
             }
             else {
@@ -160,6 +179,7 @@ public class NetJumperVer2 {
     /** 
     * Method: main 
     * Description: Runs the init() method for the existing node with all subsequent methods as per the method's comments.
+    * @param args
     */ 
     public static void main(String[] args) {
         NetJumperVer2 testUI = new NetJumperVer2();

@@ -262,6 +262,7 @@ public class Network implements Comparable<Network> {
      * @param args 
      */
     public static void main(String[] args) {
+        /*
         //test contructor, toString() and equal() method
         Network n1 = new Network("wwan1", "1000000", 100);
         Network n2 = new Network("wwan2", "2000000", 110);
@@ -297,5 +298,6 @@ public class Network implements Comparable<Network> {
         for (Network network : networks) {
             System.out.println(network.getName() + ": " + network.getLatency().get(1) + " ms" + "packet loss: " + network.getPacketLoss() + " %");
         }
+        */
     }
 }
