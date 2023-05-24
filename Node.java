@@ -9,7 +9,7 @@ import java.io.*;
  * @create: 20 Mar 2023
  * @LastUpdate: 18 May 2023
  */
-public class Node {
+public class Node implements Runnable{
     //Attributes
     //Attribute Network Size : Number of Networks 
     private int networkSize; 
@@ -567,33 +567,51 @@ public class Node {
         getName_Metric_IP();
         printNetworkList();
         getConnectionName();
-        //fullyAutomation();
-        //updateMetric();
-        //System.out.println("Update metric successful");
-        //test pingNetwork()
-        /*
-        pingAll(100, 0.01);
-        */
-        /*
-        changeMetric("wwan0", 140);
-        turnOffNetwork("wwan0");
-        turnOnNetwork("wwan0");
-        */
-        //test monitor()
-        //monitor(1);
-        //printNetworkList();
-        disconnectSSHConnection();
     }
     /** 
     * Method: main 
     * Description: Runs the init() method for the existing node with all subsequent methods as per the method's comments
     * @param args
     */ 
+    /**
+     * Method: run
+     * Description: Start Net Jumper until iteration is interrupted.
+     */
+    @Override
+    public void run() {
+        String ipAddr = ;
+        String user = ;
+        String password = ;
+        Node node = new Node(ipAddr, user, password);
+        node.getName_Metric_IP();
+        node.getConnectionName();
+        //fully automate
+        InfiniteCounter infiniteCounter = new InfiniteCounter(node);
+        Thread thread = new Thread(infiniteCounter);
+        thread.start();
+        Scanner scanner = new Scanner(System.in);
+        while (!scanner.hasNextLine());
+        infiniteCounter.booleanRun = false;
+        thread.interrupt();
+    }
     public static void main(String[] args) {
+        /*
         String ipAddr = ;
         String user = ;
         String password = ;
         Node n1 = new Node(ipAddr, user, password);
+        
         n1.init();
+        /*
+        //fully automate
+        InfiniteCounter infiniteCounter = new InfiniteCounter(n1);
+        Thread thread = new Thread(infiniteCounter);
+        thread.start();
+        Scanner scanner = new Scanner(System.in);
+        while (!scanner.hasNextLine());
+        infiniteCounter.booleanRun = false;
+        thread.interrupt();
+        n1.disconnectSSHConnection();
+        */
     }
 }
