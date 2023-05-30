@@ -391,8 +391,8 @@ public class Node implements Runnable{
         targetIP = "1.1.1.1"; // Cloudflare
         String packetLoss = new String();
         String[] latency = new String[4];
-        //String pingCmd = "ping -I " + net.getName() + " -c " + pingTime + " -i "+ pingInterval + " " + targetIP;
-        String pingCmd = "ping " + net.getIpAddress() + " -c " + pingTime + " -i "+ pingInterval;
+        String pingCmd = "ping -I " + net.getName() + " -c " + pingTime + " -i "+ pingInterval + " " + targetIP;
+        //String pingCmd = "ping " + net.getIpAddress() + " -c " + pingTime + " -i "+ pingInterval;
         ArrayList<String> in = giveCommand(pingCmd);
         String ping = in.get(in.size()-2).concat(" ").concat(in.get(in.size()-1));
         //loop for extracting the data
