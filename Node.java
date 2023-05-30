@@ -198,24 +198,27 @@ public class Node implements Runnable{
      * Description: Pastes the command1 to giveCommand and extracts the connection name.
      */
     public void getConnectionName() {
-        String command1 = "nmcli -f Name con show";
-        ArrayList<String> conName = new ArrayList<>();
+        String command1 = "nmcli -t -f DEVICE,CONNECTION device status";
         ArrayList<String> in = giveCommand(command1);
         //loop for extracting data
-        for (int i = 1;i < in.size(); i++) {
-            //String name = in.get(i).replaceAll("\\s", "");
-            // find the index of the last alphabet in the string
-            String name = in.get(i);
-            
-            // remove all white spaces after the last alphabet
-            String regex = "(?<=\\w)\\s+$";
-            name = name.replaceAll(regex, "");
-            if (!name.equals("NAME") && !name.equals("meshnet0")) {
-                conName.add(name);
+        for (int i = 0;i < in.size(); i++) {
+            String line = in.get(i);
+            String[] parts = line.split(":", 2);
+            //device name
+            String deviceName = parts[0];
+            //connection name
+            String connectionName = parts[1];
+            if ((parts[0].length() != 0 && parts[1].length() != 0) && !(parts[0].contains("meshnet") || parts[1].contains("meshnet"))) {
+                for (int j = 0;j < networkList.size(); j++) {
+                    if (deviceName.equals(networkList.get(j).getName())) {
+                        networkList.get(j).setConnectionName(connectionName);
+                    } else if (networkList.get(j).getName().contains("wwan") && (connectionName.contains("wwan") || deviceName.contains("cdc-wdm"))) {
+                        networkList.get(j).setConnectionName(connectionName);
+                    } else if (connectionName.equals(networkList.get(j).getName())) {
+                        networkList.get(j).setConnectionName(connectionName);
+                    }
+                }
             }
-        }
-        for (int i = 0;i < networkList.size(); i++) {
-            networkList.get(i).setConnectionName(conName.get(i));
         }
     }
     /**
@@ -378,7 +381,6 @@ public class Node implements Runnable{
         String command = "nmcli con up '" + connectionName + "'";
         in = giveSudoCommand(command);
         System.out.println("Turn on " + connectionName + " successfully");
-        System.out.println("Update networks' information successfully");
     }
     /**
     * Method: pingNetwork
@@ -392,6 +394,7 @@ public class Node implements Runnable{
         String packetLoss = new String();
         String[] latency = new String[4];
         String pingCmd = "ping -I " + net.getName() + " -c " + pingTime + " -i "+ pingInterval + " " + targetIP;
+        //String pingCmd = "ping " + net.getIpAddress() + " -c " + pingTime + " -i "+ pingInterval;
         ArrayList<String> in = giveCommand(pingCmd);
         String ping = in.get(in.size()-2).concat(" ").concat(in.get(in.size()-1));
         //loop for extracting the data
@@ -530,13 +533,13 @@ public class Node implements Runnable{
                 turnOffNetwork(networkList.get(i).getConnectionName());
                 turnOnNetwork(networkList.get(i).getConnectionName());
             }
-            updateNetworkInfo();
             System.out.println("Using " + networkList.get(0));
             try {
                 timer(time);
             } catch (InterruptedException e) {
                 System.out.println(e.getMessage());
             }
+            updateNetworkInfo();
         }
     }
     /**
@@ -569,9 +572,9 @@ public class Node implements Runnable{
             turnOffNetwork(networkList.get(i).getConnectionName());
             turnOnNetwork(networkList.get(i).getConnectionName());
         }
-        updateNetworkInfo();
         System.out.println("Using " + networkList.get(0));
-        timer(time);
+        updateNetworkInfo();
+        timer(time);     
     }
     /**
     * Method: disconnectSSHConnection
@@ -593,6 +596,7 @@ public class Node implements Runnable{
         getName_Metric_IP();
         printNetworkList();
         getConnectionName();
+        printNetworkList();
     }
     /**
      * Method: run
@@ -631,7 +635,7 @@ public class Node implements Runnable{
     * @param args
     */ 
     public static void main(String[] args) {
-        /*
+        
         Properties properties = new Properties();
         try (BufferedReader reader = new BufferedReader(new FileReader("config.properties"))) {
             properties.load(reader);

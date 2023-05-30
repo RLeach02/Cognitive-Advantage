@@ -102,8 +102,8 @@ public class NetJamVer2 {
                                * 4: restore network                                         *
                                * 5: restore all                                             *
                                * 6: quick ping all (100 times 0.01 interval)                *
-                               * 7: mod ping all                                           *
-                               * 8: exit                                                   *
+                               * 7: mod ping all                                            *
+                               * 8: exit                                                    *
                                **************************************************************""");   
             String ans = scan.nextLine();
             if (ans.equals("1")) {
