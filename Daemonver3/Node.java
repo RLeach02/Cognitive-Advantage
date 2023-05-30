@@ -571,7 +571,6 @@ public class Node implements Runnable{
             changeMetric(networkList.get(i).getConnectionName(), newMetric);
             turnOffNetwork(networkList.get(i).getConnectionName());
             turnOnNetwork(networkList.get(i).getConnectionName());
-            timer(1);
         }
         System.out.println("Using " + networkList.get(0));
         updateNetworkInfo();
