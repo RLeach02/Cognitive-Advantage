@@ -378,7 +378,6 @@ public class Node implements Runnable{
         String command = "nmcli con up '" + connectionName + "'";
         in = giveSudoCommand(command);
         System.out.println("Turn on " + connectionName + " successfully");
-        System.out.println("Update networks' information successfully");
     }
     /**
     * Method: pingNetwork
@@ -531,13 +530,13 @@ public class Node implements Runnable{
                 turnOffNetwork(networkList.get(i).getConnectionName());
                 turnOnNetwork(networkList.get(i).getConnectionName());
             }
-            updateNetworkInfo();
             System.out.println("Using " + networkList.get(0));
             try {
                 timer(time);
             } catch (InterruptedException e) {
                 System.out.println(e.getMessage());
             }
+            updateNetworkInfo();
         }
     }
     /**
@@ -570,9 +569,9 @@ public class Node implements Runnable{
             turnOffNetwork(networkList.get(i).getConnectionName());
             turnOnNetwork(networkList.get(i).getConnectionName());
         }
-        updateNetworkInfo();
         System.out.println("Using " + networkList.get(0));
-        timer(time);
+        updateNetworkInfo();
+        timer(time);     
     }
     /**
     * Method: disconnectSSHConnection
