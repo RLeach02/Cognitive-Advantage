@@ -198,24 +198,27 @@ public class Node implements Runnable{
      * Description: Pastes the command1 to giveCommand and extracts the connection name.
      */
     public void getConnectionName() {
-        String command1 = "nmcli -f Name con show";
-        ArrayList<String> conName = new ArrayList<>();
+        String command1 = "nmcli -t -f DEVICE,CONNECTION device status";
         ArrayList<String> in = giveCommand(command1);
         //loop for extracting data
-        for (int i = 1;i < in.size(); i++) {
-            //String name = in.get(i).replaceAll("\\s", "");
-            // find the index of the last alphabet in the string
-            String name = in.get(i);
-            
-            // remove all white spaces after the last alphabet
-            String regex = "(?<=\\w)\\s+$";
-            name = name.replaceAll(regex, "");
-            if (!name.equals("NAME") && !name.equals("meshnet0")) {
-                conName.add(name);
+        for (int i = 0;i < in.size(); i++) {
+            String line = in.get(i);
+            String[] parts = line.split(":", 2);
+            //device name
+            String deviceName = parts[0];
+            //connection name
+            String connectionName = parts[1];
+            if ((parts[0].length() != 0 && parts[1].length() != 0) && !(parts[0].contains("meshnet") || parts[1].contains("meshnet"))) {
+                for (int j = 0;j < networkList.size(); j++) {
+                    if (deviceName.equals(networkList.get(j).getName())) {
+                        networkList.get(j).setConnectionName(connectionName);
+                    } else if (networkList.get(j).getName().contains("wwan") && (connectionName.contains("wwan") || deviceName.contains("cdc-wdm"))) {
+                        networkList.get(j).setConnectionName(connectionName);
+                    } else if (connectionName.equals(networkList.get(j).getName())) {
+                        networkList.get(j).setConnectionName(connectionName);
+                    }
+                }
             }
-        }
-        for (int i = 0;i < networkList.size(); i++) {
-            networkList.get(i).setConnectionName(conName.get(i));
         }
     }
     /**
@@ -568,6 +571,7 @@ public class Node implements Runnable{
             changeMetric(networkList.get(i).getConnectionName(), newMetric);
             turnOffNetwork(networkList.get(i).getConnectionName());
             turnOnNetwork(networkList.get(i).getConnectionName());
+            timer(1);
         }
         System.out.println("Using " + networkList.get(0));
         updateNetworkInfo();
@@ -593,6 +597,7 @@ public class Node implements Runnable{
         getName_Metric_IP();
         printNetworkList();
         getConnectionName();
+        printNetworkList();
     }
     /**
      * Method: run
@@ -631,7 +636,7 @@ public class Node implements Runnable{
     * @param args
     */ 
     public static void main(String[] args) {
-        /*
+        
         Properties properties = new Properties();
         try (BufferedReader reader = new BufferedReader(new FileReader("config.properties"))) {
             properties.load(reader);
