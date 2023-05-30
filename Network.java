@@ -254,7 +254,7 @@ public class Network implements Comparable<Network> {
      */
     @Override
     public String toString() {
-        return "Network{" + "name=" + name + ", ipAddress=" + ipAddress + ", metric=" + metric +"}";
+        return "Network{" + "name=" + name + ", ipAddress=" + ipAddress + ", metric=" + metric + ", connection name=" + connectionName + "}";
     }
     /**
      * Method: main 
