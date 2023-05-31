@@ -212,7 +212,7 @@ public class Node implements Runnable{
                 for (int j = 0;j < networkList.size(); j++) {
                     if (deviceName.equals(networkList.get(j).getName())) {
                         networkList.get(j).setConnectionName(connectionName);
-                    } else if (networkList.get(j).getName().contains("wwan") && (connectionName.contains("wwan") || deviceName.contains("cdc-wdm"))) {
+                    } else if (networkList.get(j).getName().contains("ww") && (connectionName.contains("wwan") || deviceName.contains("cdc-wdm"))) {
                         networkList.get(j).setConnectionName(connectionName);
                     } else if (connectionName.equals(networkList.get(j).getName())) {
                         networkList.get(j).setConnectionName(connectionName);
