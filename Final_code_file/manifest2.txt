@@ -1,0 +1,2 @@
+Main-Class: NetJamUI
+Class-Path: jsch-0.1.55.jar
