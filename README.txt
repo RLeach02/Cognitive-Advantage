@@ -10,3 +10,8 @@ Choose the degredation tools between NetJamUserInterface.java and NetJamVer2.jav
 
 NetJumperUserInterface.java and NetJamUserInterface.java will provide easier option for the testbed
 but NetJumperVer2.java and NetJamVer2.java provide simple version, easier to understand and work better when scalable.
+
+To Monitor the performance of the testbed or scalable network, import the Following JSON Files:
+1. Developer Console JSON
+2. Operator Console JSON
+These can be found within the NetMonitor.zip package.
